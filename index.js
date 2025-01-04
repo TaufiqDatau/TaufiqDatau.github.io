@@ -7,6 +7,13 @@ for (i = 0; i < data.length; i += 70) {
     collision.push(data.slice(i, i + 70))
 }
 const boundaries = []
+// Player's position in the game world
+const player = {
+    x: 512, // Initial x-coordinate in the game world
+    y: 288, // Initial y-coordinate in the game world
+    width: 50, // Width of player sprite
+    height: 72, // Height of player sprite
+};
 
 
 
@@ -14,8 +21,8 @@ const boundaries = []
 
 
 const offset = {
-    x: 300,
-    y: 1000
+    x: 0,
+    y: 0
 }
 class Sprite {
     constructor({
@@ -42,6 +49,7 @@ class Sprite {
 class Boundary {
     static width = 48;
     static height = 48;
+ 
 
     constructor({position}) {
         this.position = position;
@@ -50,10 +58,12 @@ class Boundary {
     }
 
     draw({ offsetX, offsetY }) {
+        const cameraX = player.x - canvas.width / 2;
+        const cameraY = player.y - canvas.height / 2;
         c.fillStyle = 'red';
         c.fillRect(
-            this.position.x - offsetX,
-            this.position.y - offsetY,
+            this.position.x - offsetX -cameraX,
+            this.position.y - offsetY -cameraY,
             this.width,
             this.height
         );
@@ -88,14 +98,6 @@ const background = new Sprite({
     },
     image: image
 });
-
-// Player's position in the game world
-const player = {
-    x: 512, // Initial x-coordinate in the game world
-    y: 288, // Initial y-coordinate in the game world
-    width: 50, // Width of player sprite
-    height: 72, // Height of player sprite
-};
 
 const keys = {
     w: {
@@ -136,8 +138,8 @@ function animate() {
             playerImage.height,
             canvas.width / 2 - player.width / 2, // Center the player
             canvas.height / 2 - player.height / 2,
-            player.width,
-            player.height
+            playerImage.width/4,
+            playerImage.height
         );
     }
   
@@ -159,6 +161,7 @@ function animate() {
 // Load images
 image.src = './img/InitialMap.png';
 playerImage.src = './img/playerDown.png';
+
 
 // Ensure images are drawn once loaded
 image.onload = animate;
