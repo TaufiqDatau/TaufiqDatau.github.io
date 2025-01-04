@@ -9,16 +9,11 @@ for (i = 0; i < data.length; i += 70) {
 const boundaries = []
 // Player's position in the game world
 const player = {
-    x: 512, // Initial x-coordinate in the game world
-    y: 288, // Initial y-coordinate in the game world
+    x: 370, // Initial x-coordinate in the game world
+    y: 825, // Initial y-coordinate in the game world
     width: 50, // Width of player sprite
     height: 72, // Height of player sprite
 };
-
-
-
-
-
 
 const offset = {
     x: 0,
@@ -28,20 +23,31 @@ class Sprite {
     constructor({
         position,
         velocity,
-        image
+        image,
+        frames = { max: 1 }
     }) {
         this.position = position;
         this.image = image
+        this.frames = frames
     }
 
 
 
-    draw() {
+    draw({ offsetX = 0, offsetY = 0 }) {
         if (this.image.complete) {
-            // Calculate camera offsets
-            const cameraX = player.x - canvas.width / 2;
-            const cameraY = player.y - canvas.height / 2;
-            c.drawImage(image, -cameraX - offset.x - this.position.x, -cameraY - offset.y - this.position.y); // Offset the map to center on the player
+
+            c.drawImage(
+                this.image,
+                0,
+                0,
+                this.image.width / this.frames.max, // Draw one frame of the sprite
+                this.image.height,
+                offsetX - this.position.x,
+                offsetY - this.position.y,
+                this.image.width / this.frames.max,
+                this.image.height
+            );
+
         }
     }
 }
@@ -49,9 +55,9 @@ class Sprite {
 class Boundary {
     static width = 48;
     static height = 48;
- 
 
-    constructor({position}) {
+
+    constructor({ position }) {
         this.position = position;
         this.width = 48;
         this.height = 48;
@@ -62,8 +68,8 @@ class Boundary {
         const cameraY = player.y - canvas.height / 2;
         c.fillStyle = 'red';
         c.fillRect(
-            this.position.x - offsetX -cameraX,
-            this.position.y - offsetY -cameraY,
+            this.position.x - offsetX - cameraX,
+            this.position.y - offsetY - cameraY,
             this.width,
             this.height
         );
@@ -119,7 +125,9 @@ function animate() {
     window.requestAnimationFrame(animate)
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    background.draw()
+    const cameraX = player.x - canvas.width / 2;
+    const cameraY = player.y - canvas.height / 2;
+    background.draw({ offsetX: -cameraX - offset.x, offsetY: -cameraY - offset.y })
     // Draw boundaries adjusted for camera movement
     boundaries.forEach(boundary => {
         boundary.draw({
@@ -138,12 +146,12 @@ function animate() {
             playerImage.height,
             canvas.width / 2 - player.width / 2, // Center the player
             canvas.height / 2 - player.height / 2,
-            playerImage.width/4,
+            playerImage.width / 4,
             playerImage.height
         );
     }
-  
-   
+
+
 
     if (keys.w.pressed) {
         background.position.y = background.position.y - 9
