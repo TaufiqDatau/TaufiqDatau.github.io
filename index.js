@@ -1,9 +1,19 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 const image = new Image();
-const playerImage = new Image();
+
 const foregroundImage = new Image();
 const collision = [];
+
+const playerDownImage = new Image();
+playerDownImage.src = './img/playerDown.png';
+const playerUpImage = new Image();
+playerUpImage.src = './img/playerUp.png';
+const playerRightImage = new Image();
+playerRightImage.src = './img/playerRight.png';
+const playerLeftImage = new Image();
+playerLeftImage.src = './img/playerLeft.png';
+
 for (i = 0; i < data.length; i += 70) {
     collision.push(data.slice(i, i + 70))
 }
@@ -20,43 +30,7 @@ const offset = {
     x: 0,
     y: -500
 }
-class Sprite {
-    constructor({
-        position,
-        image,
-        frames = { max: 1 },
-        scale = 1
-    }) {
-        this.position = position;
-        this.image = image
-        this.frames = frames
-        this.scale = scale
 
-        this.image.onload = () => {
-            this.width = this.image.width / this.frames.max * this.scale
-            this.height = this.image.height * this.scale
-        }
-    }
-
-
-
-    draw() {
-        if (this.image.complete) {
-            c.drawImage(
-                this.image,
-                0,
-                0,
-                this.image.width / this.frames.max, // Draw one frame of the sprite
-                this.image.height,
-                this.position.x,
-                this.position.y,
-                this.image.width / this.frames.max * this.scale,
-                this.image.height * this.scale
-            );
-
-        }
-    }
-}
 
 collision.forEach((row, i) => {
     row.forEach((symbol, j) => {
@@ -97,9 +71,15 @@ const playerSprite = new Sprite({
         x: 700,
         y: 450,
     },
-    image: playerImage,
+    image: playerDownImage,
     frames: { max: 4 },
-    scale: 0.8
+    scale: 1,
+    sprites:{
+        up: playerUpImage,
+        down: playerDownImage,
+        left: playerLeftImage,
+        right: playerRightImage
+    }
 })
 
 const keys = {
@@ -154,6 +134,8 @@ function animate() {
 
     let moving = true;
     if (keys.w.pressed) {
+        playerSprite.moving = true;
+        playerSprite.image = playerSprite.sprites.up;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -177,6 +159,8 @@ function animate() {
             })
         }
     } else if (keys.s.pressed) {
+        playerSprite.moving = true;
+        playerSprite.image = playerSprite.sprites.down;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -200,6 +184,8 @@ function animate() {
             })
         }
     } else if (keys.a.pressed) {
+        playerSprite.moving = true;
+        playerSprite.image = playerSprite.sprites.left;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -223,6 +209,8 @@ function animate() {
             })
         }
     } else if (keys.d.pressed) {
+        playerSprite.moving = true;
+        playerSprite.image = playerSprite.sprites.right;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -252,7 +240,7 @@ function animate() {
 
 // Load images
 image.src = './img/InitialMap.png';
-playerImage.src = './img/playerDown.png';
+
 foregroundImage.src = './img/Foreground.png'
 
 
@@ -294,15 +282,19 @@ window.addEventListener('keypress', (e) => {
 window.addEventListener('keyup', (e) => {
     switch (e.key) {
         case 'w':
+            playerSprite.moving = false;
             keys.w.pressed = false;
             break;
         case 'a':
+            playerSprite.moving = false;
             keys.a.pressed = false;
             break;
         case 's':
+            playerSprite.moving = false;
             keys.s.pressed = false;
             break;
         case 'd':
+            playerSprite.moving = false;
             keys.d.pressed = false;
             break;
         default:
