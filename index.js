@@ -46,8 +46,8 @@ class Sprite {
                 this.image,
                 0,
                 0,
-                this.image.width / this.frames.max , // Draw one frame of the sprite
-                this.image.height ,
+                this.image.width / this.frames.max, // Draw one frame of the sprite
+                this.image.height,
                 this.position.x,
                 this.position.y,
                 this.image.width / this.frames.max * this.scale,
@@ -57,33 +57,6 @@ class Sprite {
         }
     }
 }
-
-class Boundary {
-    static width = 48;
-    static height = 48;
-
-
-    constructor({ position }) {
-        this.position = position;
-        this.width = 48;
-        this.height = 48;
-    }
-
-    draw() {
-
-        c.fillStyle = 'rgba(255, 0, 0, 0)'; // Fully transparent red
-
-        c.fillRect(
-            this.position.x,
-            this.position.y,
-            this.width,
-            this.height
-        );
-    }
-}
-
-
-
 
 collision.forEach((row, i) => {
     row.forEach((symbol, j) => {
@@ -112,8 +85,8 @@ const background = new Sprite({
 });
 const foreground = new Sprite({
     position: {
-        x: offset.x ,
-        y: offset.y 
+        x: offset.x,
+        y: offset.y
     },
     image: foregroundImage
 })
@@ -160,7 +133,7 @@ const testBoundary = new Boundary({
     }
 })
 
-const movables = [background, ...boundaries,foreground]
+const movables = [background, ...boundaries, foreground]
 function animate() {
     window.requestAnimationFrame(animate)
     canvas.width = window.innerWidth;
@@ -258,7 +231,7 @@ function animate() {
                     rectangle2: {
                         ...boundary, position: {
                             x: boundary.position.x - 3,
-                            y: boundary.position.y 
+                            y: boundary.position.y
                         }
                     }
                 })
