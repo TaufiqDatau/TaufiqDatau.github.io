@@ -35,9 +35,9 @@ class Sprite {
                 this.image.height * this.scale
             );
             // // Draw the border
-            c.strokeStyle = 'red'; // Set the border color
-            c.lineWidth = 2; // Set the border thickness
-            c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+            // c.strokeStyle = 'red'; // Set the border color
+            // c.lineWidth = 2; // Set the border thickness
+            // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
             if (!this.moving) return;
             if (this.frames.max > 1) {
@@ -67,9 +67,9 @@ class Boundary {
     draw() {
 
         c.fillStyle = 'rgba(255, 0, 0, 0)'; // Fully transparent red
-        c.strokeStyle = 'red'; // Set the border color
-        c.lineWidth = 2; // Set the border thickness
-        c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+        // c.strokeStyle = 'red'; // Set the border color
+        // c.lineWidth = 2; // Set the border thickness
+        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,
@@ -88,22 +88,28 @@ class TextBox {
         this.scrollOffset = 0; // Current scroll position
         this.elapsed = 0;
         this.textBoxImage = image
+        this.onDialog = false;
     }
 
-    draw(canvas) {
-        const c = canvas.getContext('2d');
+    draw(canvas,character) {
+        if (!this.onDialog) return;
 
         // Set the dimensions and position of the text box
         const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
         const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
         const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
         const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
+        if(character){
+            character.position.x = x;
+            character.position.y = y - character.height;
+            character.draw()
+        }
 
         // Draw the text box
         c.drawImage(this.textBoxImage, x, y, textBoxWidth, textBoxHeight);
 
         // Set text properties
-        c.font = '25px rpg'; // Customize font size and style
+        c.font = '20px rpg'; // Customize font size and style
         c.fillStyle = 'white'; // Text color
         c.textAlign = 'left';
 
@@ -112,7 +118,7 @@ class TextBox {
         const textX = x + padding;
         const textY = y + padding + 25;
         const textWidth = textBoxWidth - 2 * padding;
-        const lineHeight = 25; // Adjust line height based on font size
+        const lineHeight = 35; // Adjust line height based on font size
 
         // Wrap the text
         const lines = this.wrapText(c, this.displayedText, textWidth);
@@ -120,7 +126,7 @@ class TextBox {
         // Clip the text area to allow scrolling
         c.save();
         c.beginPath();
-        c.rect(x + padding, y + padding, textWidth, textBoxHeight - 2 * padding);
+        c.rect(x + padding, y + padding, textWidth, textBoxHeight );
         c.clip();
 
         // Draw visible lines based on scrollOffset
@@ -181,6 +187,7 @@ class TextBox {
     // Scroll the text box manually (for custom scroll behavior)
     scroll(amount, canvas) {
         const c = canvas.getContext('2d');
+        if(this.currentCharIndex < this.content.length) return;
 
         // Calculate the total height of all lines
         const textBoxWidth = canvas.width * 0.8;
@@ -191,7 +198,7 @@ class TextBox {
         const totalHeight = lines.length * lineHeight;
 
         // Limit scrolling within bounds
-        const maxScroll = Math.max(0, totalHeight - (canvas.height * 0.2 - 2 * padding));
+        const maxScroll = Math.max(0, totalHeight - (canvas.height * 0.2 - 2 * 50));
         this.scrollOffset = Math.max(0, Math.min(this.scrollOffset + amount, maxScroll));
     }
 
@@ -199,9 +206,5 @@ class TextBox {
         this.currentCharIndex = 0;
         this.displayedText = '';
         this.scrollOffset = 0;
-    }
-
-   
-
-    
+    }    
 }

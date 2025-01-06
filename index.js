@@ -16,6 +16,9 @@ playerRightImage.src = './img/playerRight.png';
 const playerLeftImage = new Image();
 playerLeftImage.src = './img/playerLeft.png';
 
+const RiseImage = new Image();
+RiseImage.src = './img/Rise.png'
+
 for (i = 0; i < data.length; i += 70) {
     collision.push(data.slice(i, i + 70))
 }
@@ -66,7 +69,15 @@ const foreground = new Sprite({
     },
     image: foregroundImage
 });
-const OpeningString = `Hello! My name is Taufiq, and I am a passionate Software Engineer. Welcome to my RPG world, This world is a reflection of my journey as a developer — full of challenges and adventures.
+const rise = new Sprite({
+    position:{
+        x: 0,
+        y: 0,
+    },
+    image: RiseImage,
+    scale: 2
+})
+const OpeningString = `Hey, hey! 🎤 Welcome to Taufiq personal website—no, wait, scratch that! It’s more like your front-row ticket to an RPG epic starring… drumroll please... a Software Engineering Hero! 🌟 You’re gonna love it here, trust me! The whole site? It’s like a game where you get to explore [Your Name’s] incredible skills and projects. 💻✨
 `
 const textBox = new TextBox({str:OpeningString,image:textBoxImage});
 
@@ -99,7 +110,13 @@ const keys = {
     },
     d: {
         pressed: false
-    }
+    },
+    arrowUp: {
+        pressed: false
+    },
+    arrowDown:{
+        pressed: false
+    },
 }
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
@@ -126,11 +143,21 @@ function animate() {
 
     playerSprite.draw();
     foreground.draw();
-    textBox.draw(canvas);
+    textBox.draw(canvas,rise);
 
 
 
     let moving = true;
+    if (textBox.onDialog){
+        playerSprite.moving = false;
+        playerSprite.frames.val = 0;
+        if(keys.w.pressed){
+            textBox.scroll(5,canvas)
+        }else if(keys.s.pressed){
+            textBox.scroll(-5,canvas)
+        }
+        return;
+    };
     if (keys.w.pressed) {
         playerSprite.moving = true;
         playerSprite.image = playerSprite.sprites.up;
@@ -231,16 +258,13 @@ function animate() {
                 movableObject.position.x -= 3;
             })
         }
-    }
-  
-   
+    } 
 }
 
 
 
 // Load images
 image.src = './img/InitialMap.png';
-
 foregroundImage.src = './img/Foreground.png'
 
 
@@ -248,12 +272,15 @@ foregroundImage.src = './img/Foreground.png'
 // Keypress event listener
 window.addEventListener('keypress', (e) => {
     switch (e.key) {
+        case 'ArrowUp':
+            console.log('up pressed')
+            keys.arrowUp.pressed = true;
+            break;
+        case 'ArrowDown':
+            keys.arrowDown.pressed = true;
         case 'Enter':
             textBox.restartText();
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
+            textBox.onDialog = !textBox.onDialog;
             break;
         case 'w':
             keys.w.pressed = true;
@@ -288,6 +315,12 @@ window.addEventListener('keypress', (e) => {
 // Key release event listener (optional)
 window.addEventListener('keyup', (e) => {
     switch (e.key) {
+        case 'ArrowUp':
+            keys.arrowUp.pressed = false;
+            break;
+        case 'ArrowDown':
+            keys.arrowDown.pressed = false;
+            break;
         case 'w':
             playerSprite.moving = false;
             keys.w.pressed = false;
