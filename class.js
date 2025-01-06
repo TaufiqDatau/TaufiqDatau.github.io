@@ -83,30 +83,125 @@ class Boundary {
 class TextBox {
     constructor({str, image}) {
         this.content = str; // The text content to be displayed in the text box
+        this.displayedText = ''; // Text currently displayed
+        this.currentCharIndex = 0; // Index of the character being displayed
+        this.scrollOffset = 0; // Current scroll position
+        this.elapsed = 0;
         this.textBoxImage = image
     }
 
     draw(canvas) {
+        const c = canvas.getContext('2d');
 
+        // Set the dimensions and position of the text box
+        const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
+        const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
+        const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
+        const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
 
-            // Set the dimensions and position of the text box
-            const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
-            const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
-            const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
-            const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
-            // Draw the text box
-            c.drawImage(this.textBoxImage, x,y, textBoxWidth, textBoxHeight);
+        // Draw the text box
+        c.drawImage(this.textBoxImage, x, y, textBoxWidth, textBoxHeight);
 
+        // Set text properties
+        c.font = '25px rpg'; // Customize font size and style
+        c.fillStyle = 'white'; // Text color
+        c.textAlign = 'left';
 
-            // Set text properties
-            c.font = '20px Arial'; // Customize font size and style
-            c.fillStyle = 'black'; // Text color
-            c.textAlign = 'center';
+        // Calculate the text area inside the box
+        const padding = 15; // Padding for text inside the box
+        const textX = x + padding;
+        const textY = y + padding + 25;
+        const textWidth = textBoxWidth - 2 * padding;
+        const lineHeight = 25; // Adjust line height based on font size
 
-            // Draw the text inside the text box
-            const textX = canvas.width / 2; // Center horizontally
-            const textY = y + textBoxHeight / 2 + 5; // Center vertically in the box
-            c.fillText(this.content, textX, textY);
+        // Wrap the text
+        const lines = this.wrapText(c, this.displayedText, textWidth);
 
+        // Clip the text area to allow scrolling
+        c.save();
+        c.beginPath();
+        c.rect(x + padding, y + padding, textWidth, textBoxHeight - 2 * padding);
+        c.clip();
+
+        // Draw visible lines based on scrollOffset
+        let currentY = textY - this.scrollOffset;
+        for (const line of lines) {
+            if (currentY + lineHeight > y + textBoxHeight - padding) break; // Stop if exceeding box height
+            if (currentY + lineHeight > y + padding) {
+                c.fillText(line, textX, currentY);
+            }
+            currentY += lineHeight;
+        }
+
+        c.restore(); // Restore the canvas clipping
+
+        // Automatically scroll the text if necessary to follow the typewriter effect
+        if (this.currentCharIndex < this.content.length) {
+            if(this.elapsed % 2 == 0){
+                this.displayedText += this.content[this.currentCharIndex];
+                this.currentCharIndex++;
+    
+                // Scroll down as new text is added
+                const totalHeight = lines.length * lineHeight;
+                const boxHeight = textBoxHeight - (2 * padding + 25);
+                if (totalHeight > boxHeight) {
+                    const maxScroll = totalHeight - boxHeight;
+                    this.scrollOffset = Math.min(this.scrollOffset + lineHeight, maxScroll);
+                }
+                this.elapsed = 0;
+            }
+            this.elapsed++;
+        }
     }
+
+    wrapText(context, text, maxWidth) {
+        const words = text.split(' '); // Split text into words
+        const lines = [];
+        let currentLine = '';
+
+        for (const word of words) {
+            const testLine = currentLine + word + ' ';
+            const testWidth = context.measureText(testLine).width;
+
+            if (testWidth > maxWidth) {
+                lines.push(currentLine.trim());
+                currentLine = word + ' ';
+            } else {
+                currentLine = testLine;
+            }
+        }
+
+        if (currentLine) {
+            lines.push(currentLine.trim());
+        }
+
+        return lines;
+    }
+
+    // Scroll the text box manually (for custom scroll behavior)
+    scroll(amount, canvas) {
+        const c = canvas.getContext('2d');
+
+        // Calculate the total height of all lines
+        const textBoxWidth = canvas.width * 0.8;
+        const padding = 15;
+        const textWidth = textBoxWidth - 2 * padding;
+        const lineHeight = 30;
+        const lines = this.wrapText(c, this.content, textWidth);
+        const totalHeight = lines.length * lineHeight;
+
+        // Limit scrolling within bounds
+        const maxScroll = Math.max(0, totalHeight - (canvas.height * 0.2 - 2 * padding));
+        this.scrollOffset = Math.max(0, Math.min(this.scrollOffset + amount, maxScroll));
+    }
+
+    restartText(){
+        this.currentCharIndex = 0;
+        this.displayedText = '';
+        this.scrollOffset = 0;
+    }
+
+   
+
+    
 }

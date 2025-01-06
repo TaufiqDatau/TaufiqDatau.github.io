@@ -66,7 +66,9 @@ const foreground = new Sprite({
     },
     image: foregroundImage
 });
-const textBox = new TextBox({str:'hello world',image:textBoxImage});
+const OpeningString = `Hello! My name is Taufiq, and I am a passionate Software Engineer. Welcome to my RPG world, This world is a reflection of my journey as a developer — full of challenges and adventures.
+`
+const textBox = new TextBox({str:OpeningString,image:textBoxImage});
 
 
 const playerSprite = new Sprite({
@@ -246,6 +248,13 @@ foregroundImage.src = './img/Foreground.png'
 // Keypress event listener
 window.addEventListener('keypress', (e) => {
     switch (e.key) {
+        case 'Enter':
+            textBox.restartText();
+            keys.w.pressed = false;
+            keys.a.pressed = false;
+            keys.s.pressed = false;
+            keys.d.pressed = false;
+            break;
         case 'w':
             keys.w.pressed = true;
             keys.a.pressed = false;

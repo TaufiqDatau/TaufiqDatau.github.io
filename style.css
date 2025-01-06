@@ -9,3 +9,8 @@ canvas {
     background-size: auto; /* Use the original size of the image */
     background-position: top left; /* Align to the top-left corner */
   }
+
+@font-face {
+    font-family: 'rpg';
+    src: url('./Font/PressStart2P-Regular.ttf');
+}
