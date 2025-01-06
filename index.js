@@ -3,6 +3,8 @@ const c = canvas.getContext('2d');
 const image = new Image();
 
 const foregroundImage = new Image();
+const textBoxImage = new Image();
+textBoxImage.src = './img/text-box.png'
 const collision = [];
 
 const playerDownImage = new Image();
@@ -63,7 +65,8 @@ const foreground = new Sprite({
         y: offset.y
     },
     image: foregroundImage
-})
+});
+const textBox = new TextBox({str:'hello world',image:textBoxImage});
 
 
 const playerSprite = new Sprite({
@@ -106,13 +109,6 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
     )
 }
 
-const testBoundary = new Boundary({
-    position: {
-        x: 400,
-        y: 400
-    }
-})
-
 const movables = [background, ...boundaries, foreground]
 function animate() {
     window.requestAnimationFrame(animate)
@@ -126,10 +122,10 @@ function animate() {
 
     });
 
-    // testBoundary.draw();
-
     playerSprite.draw();
     foreground.draw();
+    textBox.draw(canvas);
+
 
 
     let moving = true;
@@ -234,6 +230,8 @@ function animate() {
             })
         }
     }
+  
+   
 }
 
 

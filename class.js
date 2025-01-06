@@ -34,7 +34,12 @@ class Sprite {
                 this.image.width / this.frames.max * this.scale,
                 this.image.height * this.scale
             );
-            if(!this.moving) return;
+            // // Draw the border
+            // c.strokeStyle = 'red'; // Set the border color
+            // c.lineWidth = 2; // Set the border thickness
+            // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+
+            if (!this.moving) return;
             if (this.frames.max > 1) {
                 this.frames.elapsed++
             }
@@ -62,6 +67,9 @@ class Boundary {
     draw() {
 
         c.fillStyle = 'rgba(255, 0, 0, 0)'; // Fully transparent red
+        // c.strokeStyle = 'red'; // Set the border color
+        // c.lineWidth = 2; // Set the border thickness
+        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,
@@ -69,5 +77,36 @@ class Boundary {
             this.width,
             this.height
         );
+    }
+}
+
+class TextBox {
+    constructor({str, image}) {
+        this.content = str; // The text content to be displayed in the text box
+        this.textBoxImage = image
+    }
+
+    draw(canvas) {
+
+
+            // Set the dimensions and position of the text box
+            const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
+            const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
+            const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
+            const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
+            // Draw the text box
+            c.drawImage(this.textBoxImage, x,y, textBoxWidth, textBoxHeight);
+
+
+            // Set text properties
+            c.font = '20px Arial'; // Customize font size and style
+            c.fillStyle = 'black'; // Text color
+            c.textAlign = 'center';
+
+            // Draw the text inside the text box
+            const textX = canvas.width / 2; // Center horizontally
+            const textY = y + textBoxHeight / 2 + 5; // Center vertically in the box
+            c.fillText(this.content, textX, textY);
+
     }
 }
