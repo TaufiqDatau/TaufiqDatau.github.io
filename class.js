@@ -35,9 +35,9 @@ class Sprite {
                 this.image.height * this.scale
             );
             // // Draw the border
-            c.strokeStyle = 'red'; // Set the border color
-            c.lineWidth = 2; // Set the border thickness
-            c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+            // c.strokeStyle = 'red'; // Set the border color
+            // c.lineWidth = 2; // Set the border thickness
+            // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
             if (!this.moving) return;
             if (this.frames.max > 1) {
@@ -54,14 +54,14 @@ class Sprite {
 }
 
 class Boundary {
-    static width = 48;
-    static height = 48;
+    static width = 72;
+    static height = 72;
 
 
     constructor({ position }) {
         this.position = position;
-        this.width = 48;
-        this.height = 48;
+        this.width = 72;
+        this.height = 72;
     }
 
     draw() {

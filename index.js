@@ -19,8 +19,8 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
-for (i = 0; i < data.length; i += 70) {
-    collision.push(data.slice(i, i + 70))
+for (i = 0; i < collisionData.length; i += 70) {
+    collision.push(collisionData.slice(i, i + 70))
 }
 const boundaries = []
 // Player's position in the game world
@@ -32,14 +32,14 @@ const player = {
 };
 
 const offset = {
-    x: 0,
-    y: -500
+    x: -175,
+    y: -1200
 }
 
 
 collision.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        if (symbol == 1025) {
+        if (symbol == 1432) {
             boundaries.push(
                 new Boundary({
                     position: {
@@ -264,7 +264,7 @@ function animate() {
 
 
 // Load images
-image.src = './img/InitialMap.png';
+image.src = './img/NewMap.png';
 foregroundImage.src = './img/Foreground.png'
 
 
