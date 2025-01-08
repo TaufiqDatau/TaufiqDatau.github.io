@@ -6,6 +6,7 @@ const foregroundImage = new Image();
 const textBoxImage = new Image();
 textBoxImage.src = './img/text-box.png'
 const collision = [];
+const battleZone = [];
 
 const playerDownImage = new Image();
 playerDownImage.src = './img/playerDown.png';
@@ -20,9 +21,14 @@ const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
 for (i = 0; i < collisionData.length; i += 70) {
-    collision.push(collisionData.slice(i, i + 70))
+    collision.push(collisionData.slice(i, i + 70));
 }
-const boundaries = []
+const boundaries = [];
+const battleZones = [];
+
+for(j = 0; j< battlezoneData.length; j+= 70){
+    battleZone.push(battlezoneData.slice(j, j+70));
+}
 // Player's position in the game world
 const player = {
     x: 325, // Initial x-coordinate in the game world
@@ -52,6 +58,21 @@ collision.forEach((row, i) => {
 
     })
 });
+
+battleZone.forEach((row, i)=>{
+    row.forEach((symbol, j)=>{
+        if(symbol == 1537){
+           battleZones.push( new Boundary({
+                position:{
+                    x: j * Boundary.height + offset.x,
+                    y: i * Boundary.width + offset.y
+                },
+                color: 'green'
+            })
+        )
+        }
+    })
+})
 
 
 
@@ -128,7 +149,7 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
     )
 }
 
-const movables = [background, ...boundaries, foreground]
+const movables = [background, ...boundaries, foreground, ...battleZones]
 function animate() {
     window.requestAnimationFrame(animate)
     canvas.width = window.innerWidth;
@@ -138,12 +159,16 @@ function animate() {
     // Draw boundaries adjusted for camera movement
     boundaries.forEach(boundary => {
         boundary.draw();
-
     });
+    battleZones.forEach(bz =>{
+        bz.draw();
+    })
+   
 
     playerSprite.draw();
     foreground.draw();
     textBox.draw(canvas,rise);
+    
 
 
 
@@ -265,7 +290,7 @@ function animate() {
 
 // Load images
 image.src = './img/NewMap.png';
-foregroundImage.src = './img/Foreground.png'
+foregroundImage.src = './img/Foreground_Map.png'
 
 
 
