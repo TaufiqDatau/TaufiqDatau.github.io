@@ -21,7 +21,7 @@ class Sprite {
 
 
 
-    draw() {
+    draw(height, width) {
         if (this.image.complete) {
             c.drawImage(
                 this.image,
@@ -31,8 +31,8 @@ class Sprite {
                 this.image.height,
                 this.position.x,
                 this.position.y,
-                this.image.width / this.frames.max * this.scale,
-                this.image.height * this.scale
+                width ?? this.image.width / this.frames.max * this.scale,
+                height ?? this.image.height * this.scale
             );
             // // Draw the border
             // c.strokeStyle = 'red'; // Set the border color

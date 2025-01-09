@@ -1,6 +1,11 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
+
+
+
+
 const image = new Image();
+
 
 const foregroundImage = new Image();
 const textBoxImage = new Image();
@@ -26,8 +31,8 @@ for (i = 0; i < collisionData.length; i += 70) {
 const boundaries = [];
 const battleZones = [];
 
-for(j = 0; j< battlezoneData.length; j+= 70){
-    battleZone.push(battlezoneData.slice(j, j+70));
+for (j = 0; j < battlezoneData.length; j += 70) {
+    battleZone.push(battlezoneData.slice(j, j + 70));
 }
 // Player's position in the game world
 const player = {
@@ -59,17 +64,17 @@ collision.forEach((row, i) => {
     })
 });
 
-battleZone.forEach((row, i)=>{
-    row.forEach((symbol, j)=>{
-        if(symbol == 1537){
-           battleZones.push( new Boundary({
-                position:{
+battleZone.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol == 1537) {
+            battleZones.push(new Boundary({
+                position: {
                     x: j * Boundary.height + offset.x,
                     y: i * Boundary.width + offset.y
                 },
                 color: 'green'
             })
-        )
+            )
         }
     })
 })
@@ -91,7 +96,7 @@ const foreground = new Sprite({
     image: foregroundImage
 });
 const rise = new Sprite({
-    position:{
+    position: {
         x: 0,
         y: 0,
     },
@@ -100,7 +105,10 @@ const rise = new Sprite({
 })
 const OpeningString = `Hey, hey! 🎤 Welcome to Taufiq personal website—no, wait, scratch that! It’s more like your front-row ticket to an RPG epic starring… drumroll please... a Software Engineering Hero! 🌟 You’re gonna love it here, trust me! The whole site? It’s like a game where you get to explore [Your Name’s] incredible skills and projects. 💻✨
 `
-const textBox = new TextBox({str:OpeningString,image:textBoxImage});
+const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
+const battle = {
+    initiated: false
+}
 
 
 const playerSprite = new Sprite({
@@ -111,7 +119,7 @@ const playerSprite = new Sprite({
     image: playerDownImage,
     frames: { max: 4 },
     scale: 1,
-    sprites:{
+    sprites: {
         up: playerUpImage,
         down: playerDownImage,
         left: playerLeftImage,
@@ -135,7 +143,7 @@ const keys = {
     arrowUp: {
         pressed: false
     },
-    arrowDown:{
+    arrowDown: {
         pressed: false
     },
 }
@@ -160,26 +168,84 @@ function animate() {
     boundaries.forEach(boundary => {
         boundary.draw();
     });
-    battleZones.forEach(bz =>{
+    battleZones.forEach(bz => {
         bz.draw();
     })
-   
+
 
     playerSprite.draw();
     foreground.draw();
-    textBox.draw(canvas,rise);
-    
+    textBox.draw(canvas, rise);
+
+    if (battle.initiated) return;
+
+    if (keys.a.pressed || keys.w.pressed || keys.s.pressed || keys.d.pressed) {
+        for (let i = 0; i < battleZones.length; i++) {
+            const zone = battleZones[i]
+            const overlappingArea = (
+                Math.min(
+                    playerSprite.position.x + playerSprite.width,
+                    zone.position.x + zone.width
+                )
+                - Math.max(
+                    playerSprite.position.x,
+                    zone.position.x)
+            ) * (
+                    Math.min(
+                        playerSprite.position.y + playerSprite.height,
+                        zone.position.y + zone.height
+                    ) -
+                    Math.max(
+                        playerSprite.position.y,
+                        zone.position.y
+                    )
+                )
 
 
+            if (
+                rectangularCollision({
+                    rectangle1: playerSprite,
+                    rectangle2: zone
+                }) &&
+                overlappingArea > (playerSprite.height * playerSprite.width) / 2 &&
+                Math.random() < 0.01
+            ) {
+                battle.initiated = true;
+                gsap.to('#overlappingDiv', {
+                    opacity: 1,
+                    backgroundColor: "red", // Adds a red tint for a dangerous vibe
+                    duration: 0.4,
+                    repeat: 3,
+                    yoyo: true,
+                    onComplete() {
+                        gsap.to('#overlappingDiv', {
+                            opacity: 1,
+                            backgroundColor: "black", // Resets the color
+                            duration: 0.4,
+                            onComplete() {
+                                animateBattle();
+                                gsap.to('#overlappingDiv', {
+                                    opacity: 0,
+                                    duration: 1
+                                });
+                            }
+                        });
+                    }
+                });
+                
+                break;
+            }
+        }
+    }
 
     let moving = true;
-    if (textBox.onDialog){
+    if (textBox.onDialog) {
         playerSprite.moving = false;
         playerSprite.frames.val = 0;
-        if(keys.w.pressed){
-            textBox.scroll(5,canvas)
-        }else if(keys.s.pressed){
-            textBox.scroll(-5,canvas)
+        if (keys.w.pressed) {
+            textBox.scroll(5, canvas)
+        } else if (keys.s.pressed) {
+            textBox.scroll(-5, canvas)
         }
         return;
     };
@@ -283,7 +349,38 @@ function animate() {
                 movableObject.position.x -= 3;
             })
         }
-    } 
+    }
+}
+
+const battleBackgroundImage = new Image();
+battleBackgroundImage.src = './img/battleBackground.png'
+const monsterImage = new Image();
+monsterImage.src = './img/monster.png';
+
+const battleBackground = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    image: battleBackgroundImage
+});
+const monster = new Sprite({
+    position: {
+        x: 0,
+        y: 0,
+    },
+    image: monsterImage,
+    scale: 0.4
+})
+function animateBattle() {
+    window.requestAnimationFrame(animateBattle)
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    
+    battleBackground.draw(canvas.height, canvas.width);
+    monster.position.x = canvas.width - 0.2 * canvas.width
+    monster.draw();
 }
 
 
@@ -369,3 +466,4 @@ window.addEventListener('keyup', (e) => {
 
 // Initial setup
 animate();
+
