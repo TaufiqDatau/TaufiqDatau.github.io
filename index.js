@@ -226,13 +226,23 @@ function animate() {
                                 animateBattle();
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
-                                    duration: 1
+                                    duration: 1,
+                                    onComplete() {
+                                        const battleCommand = document.querySelector('#battleCommand');
+                                        battleCommand.style.display = 'flex';
+
+                                        gsap.to("#battleCommand", {
+                                            duration: 1.5, // Animation duration in seconds
+                                            width: "calc(100% - 16px)", // Full width of the container
+                                            ease: "power3.out", // Smooth easing effect
+                                        });
+                                    }
                                 });
                             }
                         });
                     }
                 });
-                
+
                 break;
             }
         }
@@ -376,8 +386,6 @@ function animateBattle() {
     window.requestAnimationFrame(animateBattle)
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    
     battleBackground.draw(canvas.height, canvas.width);
     monster.position.x = canvas.width - 0.2 * canvas.width
     monster.draw();
@@ -466,4 +474,9 @@ window.addEventListener('keyup', (e) => {
 
 // Initial setup
 animate();
+
+
+
+
+
 
