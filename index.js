@@ -25,6 +25,8 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
+
+
 for (i = 0; i < collisionData.length; i += 70) {
     collision.push(collisionData.slice(i, i + 70));
 }
@@ -72,7 +74,6 @@ battleZone.forEach((row, i) => {
                     x: j * Boundary.height + offset.x,
                     y: i * Boundary.width + offset.y
                 },
-                color: 'green'
             })
             )
         }
@@ -234,7 +235,14 @@ function animate() {
                                         gsap.to("#battleCommand", {
                                             duration: 1.5, // Animation duration in seconds
                                             width: "calc(100% - 16px)", // Full width of the container
-                                            ease: "power3.out", // Smooth easing effect
+                                            ease: "power3.out", // Smooth easing effect,
+                                            onComplete() {
+                                                const textElement = document.querySelector('.centerText');
+                                                const text = "Wild Endo has appeared";
+                                                let index = 0;
+                                                typeWriter(index,text,textElement);
+
+                                            }
                                         });
                                     }
                                 });
@@ -366,6 +374,8 @@ const battleBackgroundImage = new Image();
 battleBackgroundImage.src = './img/battleBackground.png'
 const monsterImage = new Image();
 monsterImage.src = './img/monster.png';
+const myMonsterImage = new Image();
+myMonsterImage.src = './img/Faras.png';
 
 const battleBackground = new Sprite({
     position: {
@@ -381,6 +391,15 @@ const monster = new Sprite({
     },
     image: monsterImage,
     scale: 0.4
+});
+
+const myMonster = new Sprite({
+    position:{
+        x: 0,
+        y: 0
+    },
+    image: myMonsterImage,
+    scale: 0.8
 })
 function animateBattle() {
     window.requestAnimationFrame(animateBattle)
@@ -389,6 +408,20 @@ function animateBattle() {
     battleBackground.draw(canvas.height, canvas.width);
     monster.position.x = canvas.width - 0.2 * canvas.width
     monster.draw();
+    myMonster.position.x = 0.2 * canvas.width;
+    myMonster.position.y = canvas.height - 0.8 * canvas.height
+    myMonster.draw();
+}
+
+function typeWriter(index, text, textElement) {
+    if (index < text.length) {
+        textElement.textContent += text[index];
+        index++;
+        setTimeout(() => typeWriter(index, text, textElement), 20) 
+    } else {
+        // Stop the blinking cursor after typing finishes
+        textElement.style.borderRight = "none";
+    }
 }
 
 
@@ -474,6 +507,7 @@ window.addEventListener('keyup', (e) => {
 
 // Initial setup
 animate();
+
 
 
 

@@ -45,3 +45,11 @@ canvas {
     border: 2px solid black;
     pointer-events: none;
 }
+
+.centerText {
+    font-size: 24px;
+    white-space: nowrap; /* Prevent line breaks */
+    overflow: hidden; /* Hide the text overflow for the typing effect */
+    animation: blink 0.7s step-end infinite; /* Blinking cursor effect */
+}
+
