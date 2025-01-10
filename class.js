@@ -36,9 +36,9 @@ class Sprite {
                 height ?? this.image.height * this.scale
             );
             // // Draw the border
-            // c.strokeStyle = 'red'; // Set the border color
-            // c.lineWidth = 2; // Set the border thickness
-            // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+            c.strokeStyle = 'red'; // Set the border color
+            c.lineWidth = 2; // Set the border thickness
+            c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
             if (!this.moving) return;
             if (this.frames.max > 1) {
@@ -69,9 +69,9 @@ class Boundary {
     draw() {
 
         c.fillStyle = this.color ?? 'rgba(255, 0, 0, 0)'; // Fully transparent red
-        // c.strokeStyle = 'red'; // Set the border color
-        // c.lineWidth = 2; // Set the border thickness
-        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+        c.strokeStyle = 'red'; // Set the border color
+        c.lineWidth = 2; // Set the border thickness
+        c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,
