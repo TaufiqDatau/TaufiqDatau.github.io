@@ -367,7 +367,7 @@ function animate() {
 const battleBackgroundImage = new Image();
 battleBackgroundImage.src = './img/battleBackground.png'
 const monsterImage = new Image();
-monsterImage.src = './img/monster.png';
+monsterImage.src = './img/Monster.png';
 const myMonsterImage = new Image();
 myMonsterImage.src = './img/Faras.png';
 
