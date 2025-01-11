@@ -5,13 +5,14 @@ class Sprite {
         image,
         frames = { max: 1 },
         scale = 1,
-        sprites
+        sprites,
+        animate = false
     }) {
         this.position = position;
         this.image = image
         this.frames = { ...frames, val: 0, elapsed: 0 }
         this.scale = scale;
-        this.moving = false;
+        this.animate = animate;
         this.sprites = sprites;
 
         this.image.onload = () => {
@@ -36,11 +37,11 @@ class Sprite {
                 height ?? this.image.height * this.scale
             );
             // // Draw the border
-            c.strokeStyle = 'red'; // Set the border color
-            c.lineWidth = 2; // Set the border thickness
-            c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+            // c.strokeStyle = 'red'; // Set the border color
+            // c.lineWidth = 2; // Set the border thickness
+            // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
-            if (!this.moving) return;
+            if (!this.animate) return;
             if (this.frames.max > 1) {
                 this.frames.elapsed++
             }
@@ -69,9 +70,9 @@ class Boundary {
     draw() {
 
         c.fillStyle = this.color ?? 'rgba(255, 0, 0, 0)'; // Fully transparent red
-        c.strokeStyle = 'red'; // Set the border color
-        c.lineWidth = 2; // Set the border thickness
-        c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+        // c.strokeStyle = 'red'; // Set the border color
+        // c.lineWidth = 2; // Set the border thickness
+        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,

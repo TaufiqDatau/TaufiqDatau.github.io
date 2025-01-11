@@ -18,7 +18,6 @@ const playerRightImage = new Image();
 playerRightImage.src = './img/playerRight.png';
 const playerLeftImage = new Image();
 playerLeftImage.src = './img/playerLeft.png';
-
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
@@ -256,21 +255,31 @@ function animate() {
     }
 
 
-    if (textBox.onDialog) {
-        playerSprite.moving = false;
-        playerSprite.frames.val = 0;
-        if (keys.w.pressed) {
-            textBox.scroll(5, canvas)
-        } else if (keys.s.pressed) {
-            textBox.scroll(-5, canvas)
-        }
-        return;
-    };
-    controlledFunction();
+
+    if(handleTextBoxInteraction(textBox,playerSprite,canvas))return;
+    handleMovement();
     
 }
 
-function controlledFunction(){
+function handleTextBoxInteraction(textBox, playerSprite, canvas) {
+    if (!textBox.onDialog) return false; // Return false if there's no dialog interaction
+
+    // Stop the player's movement and reset animation frames
+    playerSprite.animate = false;
+    playerSprite.frames.val = 0;
+
+    // Handle scrolling through the dialog using keys
+    if (keys.w.pressed) {
+        textBox.scroll(5, canvas);
+    } else if (keys.s.pressed) {
+        textBox.scroll(-5, canvas);
+    }
+
+    return true; // Interaction handled
+}
+
+
+function handleMovement(){
     if (keys.w.pressed) movePlayer('up', 'y', 3)
      else if (keys.s.pressed) movePlayer('down','y', -3)
      else if (keys.a.pressed) movePlayer('left','x',3)
@@ -279,7 +288,7 @@ function controlledFunction(){
 
 function movePlayer(direction, axis, offset) {
     let moving = true;
-    playerSprite.moving = true;
+    playerSprite.animate = true;
     playerSprite.image = playerSprite.sprites[direction];
     
     for (let boundary of boundaries) {
@@ -311,9 +320,9 @@ function movePlayer(direction, axis, offset) {
 const battleBackgroundImage = new Image();
 battleBackgroundImage.src = './img/battleBackground.png'
 const monsterImage = new Image();
-monsterImage.src = './img/Monster.png';
+monsterImage.src = './img/draggleSprite.png';
 const myMonsterImage = new Image();
-myMonsterImage.src = './img/Faras.png';
+myMonsterImage.src = './img/embySprite.png';
 
 const battleBackground = new Sprite({
     position: {
@@ -328,7 +337,8 @@ const monster = new Sprite({
         y: 0,
     },
     image: monsterImage,
-    scale: 0.4
+    frames: {max: 4},
+    animate: true
 });
 
 const myMonster = new Sprite({
@@ -336,20 +346,36 @@ const myMonster = new Sprite({
         x: 0,
         y: 0
     },
+    frames: {max: 4},
+    animate: true,
     image: myMonsterImage,
-    scale: 0.8
 })
 function animateBattle() {
-    window.requestAnimationFrame(animateBattle)
+    const bgOriginalWidth = 1024; // Replace with your background's original width
+    const bgOriginalHeight = 576; // Replace with your background's original height
+
+    window.requestAnimationFrame(animateBattle);
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    // Draw the background
     battleBackground.draw(canvas.height, canvas.width);
-    monster.position.x = canvas.width - 0.2 * canvas.width
+
+    // Calculate scale factors
+    const scaleX = canvas.width / bgOriginalWidth;
+    const scaleY = canvas.height / bgOriginalHeight;
+
+    // Position the monsters relative to the original background dimensions
+    monster.position.x = bgOriginalWidth * 0.8 * scaleX; // Adjusted to fixed ratio
+    monster.position.y = bgOriginalHeight * 0.2 * scaleY; // Example Y position
     monster.draw();
-    myMonster.position.x = 0.2 * canvas.width;
-    myMonster.position.y = canvas.height - 0.8 * canvas.height
+
+    myMonster.position.x = bgOriginalWidth * 0.3 * scaleX; // Adjusted to fixed ratio
+    myMonster.position.y = bgOriginalHeight * 0.6 * scaleY; // Example Y position
     myMonster.draw();
 }
+
 
 function typeWriter(index, text, textElement) {
     if (index < text.length) {
@@ -423,19 +449,19 @@ window.addEventListener('keyup', (e) => {
             keys.arrowDown.pressed = false;
             break;
         case 'w':
-            playerSprite.moving = false;
+            playerSprite.animate = false;
             keys.w.pressed = false;
             break;
         case 'a':
-            playerSprite.moving = false;
+            playerSprite.animate = false;
             keys.a.pressed = false;
             break;
         case 's':
-            playerSprite.moving = false;
+            playerSprite.animate = false;
             keys.s.pressed = false;
             break;
         case 'd':
-            playerSprite.moving = false;
+            playerSprite.animate = false;
             keys.d.pressed = false;
             break;
         default:
@@ -444,7 +470,8 @@ window.addEventListener('keyup', (e) => {
 });
 
 // Initial setup
-animate();
+// animate();
+animateBattle();
 
 
 
