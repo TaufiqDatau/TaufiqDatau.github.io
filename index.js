@@ -227,18 +227,25 @@ function animate() {
                                     opacity: 0,
                                     duration: 1,
                                     onComplete() {
+                                        worm.health = 100;
+                                        myMonster.health = 100;
+                                        restoreHealth(worm,100);
+                                        restoreHealth(myMonster,100);
+                                        resetOpacity(worm);
+                                        resetOpacity(myMonster);
                                         const battleCommand = document.querySelector('#battleCommand');
                                         battleCommand.style.display = 'flex';
-
+                                        
                                         gsap.to("#battleCommand", {
                                             duration: 1.5, // Animation duration in seconds
                                             width: "calc(100% - 16px)", // Full width of the container
                                             ease: "power3.out", // Smooth easing effect,
                                             onComplete() {
-                                                const textElement = document.querySelector('.centerText');
+                                                const textElement = document.querySelector('.battleDialog');
                                                 const text = "Wild Endo has appeared";
                                                 let index = 0;
                                                 typeWriter(index, text, textElement);
+                                                hideDivs()
 
                                             }
                                         });
@@ -261,6 +268,40 @@ function animate() {
 
 }
 
+function restoreHealth(recipient, maxHealth) {
+    // Ensure recipient is valid and has a health property
+    if (!recipient || typeof recipient.health === "undefined") {
+        console.error("Invalid recipient!");
+        return;
+    }
+
+    // Restore health to maximum value
+    recipient.health = maxHealth;
+
+    // Determine the target health bar based on the recipient
+    const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus';
+    
+    // Update the health bar visually
+    const currentHealth = recipient.health + "%";
+    gsap.to(`#${targetHealth} #currentHealth`, {
+        width: currentHealth,
+        duration: 1, // Smooth animation for restoring health
+    });
+}
+
+function resetOpacity(recipient, duration = 0.1) {
+
+    // Set opacity back to 1 on both the recipient object and the DOM
+    gsap.to(recipient, {
+        opacity: 1,
+        duration: duration,
+        onComplete: () => {
+            recipient.opacity = 1; // Update the object's property
+        },
+    });
+}
+
+
 function handleTextBoxInteraction(textBox, playerSprite, canvas) {
     if (!textBox.onDialog) return false; // Return false if there's no dialog interaction
 
@@ -280,10 +321,10 @@ function handleTextBoxInteraction(textBox, playerSprite, canvas) {
 
 
 function handleMovement() {
-    if (keys.w.pressed) movePlayer('up', 'y', 3)
-    else if (keys.s.pressed) movePlayer('down', 'y', -3)
-    else if (keys.a.pressed) movePlayer('left', 'x', 3)
-    else if (keys.d.pressed) movePlayer('right', 'x', -3)
+    if (keys.w.pressed) movePlayer('up', 'y', 6)
+    else if (keys.s.pressed) movePlayer('down', 'y', -6)
+    else if (keys.a.pressed) movePlayer('left', 'x', 6)
+    else if (keys.d.pressed) movePlayer('right', 'x', -6)
 }
 
 function movePlayer(direction, axis, offset) {
@@ -316,21 +357,38 @@ function movePlayer(direction, axis, offset) {
     }
 }
 
-document.querySelectorAll('#battleCommand button').forEach((button) => {
-    button.addEventListener('click', (event) => {
-        monster.attack({ attack: attacks[event.currentTarget.innerHTML], recipient: myMonster, renderedSpritesEffect })
-    });
-});
+
+
+document.querySelector('.battleDialog').addEventListener('click',(e)=>{
+    if(queue.length > 0){
+        if(worm.health>0)queue[0]();
+        else e.currentTarget.style.display = 'none'
+        queue.shift();
+    } else e.currentTarget.style.display = 'none'
+
+    if(worm.health <= 0 || myMonster.health <=0){
+        gsap.to('#overlappingDiv',{
+            opacity:1,
+            onComplete:()=>{
+                cancelAnimationFrame(battleAnimationId)
+                hideDivs('none');
+                battle.initiated = false;
+                gsap.to('#overlappingDiv',{
+                    opacity:0,
+                    
+                })
+            }
+        })
+    }
+})
 
 
 
 
 const battleBackgroundImage = new Image();
 battleBackgroundImage.src = './img/battleBackground.png'
-const monsterImage = new Image();
-monsterImage.src = './img/draggleSprite.png';
-const myMonsterImage = new Image();
-myMonsterImage.src = './img/embySprite.png';
+
+
 
 const battleBackground = new Sprite({
     position: {
@@ -351,36 +409,38 @@ const scaleX = canvas.width / bgOriginalWidth;
 const scaleY = canvas.height / bgOriginalHeight;
 
 
-const monster = new Sprite({
+const worm = new Monster({
+    ...Monsters.Worm,
     position: {
         x: bgOriginalWidth * 0.8 * scaleX,
         y: bgOriginalHeight * 0.2 * scaleY,
     },
-    image: monsterImage,
-    frames: { max: 4 },
-    animate: true,
-    isEnemy: true,
 });
 
-const myMonster = new Sprite({
+const myMonster = new Monster({
+    ...Monsters.Emby,
     position: {
         x: bgOriginalWidth * 0.3 * scaleX,
         y: bgOriginalHeight * 0.6 * scaleY
     },
-    frames: { max: 4 },
-    animate: true,
-    image: myMonsterImage,
 });
 
+myMonster.attacks.forEach((attack)=>{
+    const Button = document.createElement("button")
+    Button.innerHTML = attack.name;
+    document.querySelector('.battleOption').append(Button);
+})
+
 const renderedSpritesEffect = []
+let battleAnimationId;
 function animateBattle() {
 
 
-    window.requestAnimationFrame(animateBattle);
+    battleAnimationId = window.requestAnimationFrame(animateBattle);
 
     // Draw the background
     battleBackground.draw(canvas.height, canvas.width);
-    monster.draw();
+    worm.draw();
     myMonster.draw();
     renderedSpritesEffect.forEach((effect)=>{
         effect.draw();
@@ -480,9 +540,36 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
+const queue = []
+
+document.querySelectorAll('#battleCommand button').forEach((button) => {
+    button.addEventListener('click', (event) => {
+        myMonster.attack({ attack: attacks[event.currentTarget.innerHTML], recipient: worm, renderedSpritesEffect });
+
+        queue.push(()=>{
+            worm.attack({
+                attack: attacks.Tackle,
+                recipient:myMonster,
+                renderedSpritesEffect
+            })
+        })
+    });
+});
+
+function hideDivs(setDiv='') {
+    const ids = ["battleCommand", "enemyHealthStatus", "myHealthStatus"];
+    ids.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = setDiv ;
+        }
+    });
+}
+
 // Initial setup
-// animate();
-animateBattle();
+hideDivs('none');
+animate();
+// animateBattle();
 
 
 

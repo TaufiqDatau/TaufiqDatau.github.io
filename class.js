@@ -7,8 +7,8 @@ class Sprite {
         scale = 1,
         sprites,
         animate = false,
-        isEnemy = false,
         rotation = false,
+
     }) {
         this.position = position;
         this.image = image
@@ -17,9 +17,8 @@ class Sprite {
         this.animate = animate;
         this.sprites = sprites;
         this.opacity = 1;
-        this.health = 100;
-        this.isEnemy = isEnemy;
         this.rotation = rotation;
+
 
         this.image.onload = () => {
             this.width = this.image.width / this.frames.max * this.scale
@@ -32,15 +31,15 @@ class Sprite {
     draw(height, width) {
         if (this.image.complete) {
             c.save();
-            if(this.rotation>0){
+            if (this.rotation > 0) {
                 c.translate(
-                    this.position.x + this.width/2,
-                    this.position.y + this.height/2
+                    this.position.x + this.width / 2,
+                    this.position.y + this.height / 2
                 )
                 c.rotate(0)
                 c.translate(
-                    -this.position.x + this.width/2,
-                    -this.position.y + this.height/2
+                    -this.position.x + this.width / 2,
+                    -this.position.y + this.height / 2
                 )
             }
             c.globalAlpha = this.opacity;
@@ -73,30 +72,44 @@ class Sprite {
             }
         }
     }
+}
 
-    damageDealt(attack, recipient) {
-        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
-        recipient.health -= attack.damage;
-        recipient.health = recipient.health < 0 ? 0: recipient.health;
-        const currentHealth = recipient.health + "%"
-        gsap.to(`#${targetHealth} #currentHealth`, {
-            width: currentHealth,
-            onComplete() {
-                if (recipient.health <= 0) {
-                    setTimeout(() => {
-                        gsap.to(recipient, {
-                            opacity: 0
-                        })
-                    }, 200)
-                }
-            }
-        });
-
+class Monster extends Sprite {
+    constructor({
+        position,
+        image,
+        frames = { max: 1 },
+        scale = 1,
+        sprites,
+        animate = false,
+        rotation = false,
+        isEnemy = false,
+        name,
+        attacks
+    }) {
+        console.log(image, name)
+        super({
+            position,
+            image,
+            frames,
+            scale,
+            sprites,
+            animate,
+            rotation,
+        })
+        this.health = 100;
+        this.isEnemy = isEnemy;
+        this.name = name;
+        this.attacks = attacks
 
     }
 
     attack({ attack, recipient, renderedSpritesEffect }) {
-        const tl = gsap.timeline()
+        const tl = gsap.timeline();
+        const battleDialog = document.querySelector('.battleDialog');
+        battleDialog.innerHTML = '';
+        battleDialog.style.display = 'flex'
+        typeWriter(0, this.name + ' used ' + attack.name, battleDialog);
         switch (attack.name) {
             case 'Fireball':
                 const fireBallImage = new Image();
@@ -107,7 +120,7 @@ class Sprite {
                         y: this.position.y,
                     },
                     image: fireBallImage,
-                    frames:{
+                    frames: {
                         max: 4,
                         elapsed: 2
                     },
@@ -116,11 +129,11 @@ class Sprite {
                 });
                 renderedSpritesEffect.push(fireball);
 
-                gsap.to(fireball.position,{
+                gsap.to(fireball.position, {
                     x: recipient.position.x,
                     y: recipient.position.y,
                     duration: 0.5,
-                    onComplete:()=>{
+                    onComplete: () => {
                         renderedSpritesEffect.pop();
                         gsap.to(recipient.position, {
                             x: recipient.position.x + 10,
@@ -132,7 +145,9 @@ class Sprite {
                             opacity: 0,
                             repeat: 5,
                             duration: 0.1,
-                            yoyo: true
+                            yoyo: true,
+                            onComplete: () => {
+                            }
                         });
                         this.damageDealt(attack, recipient);
                     }
@@ -162,13 +177,40 @@ class Sprite {
                     }
                 }).to(this.position, {
                     x: this.position.x,
+                    onComplete: () => {
+                        // battleOption.forEach((obj) => {
+                        //     obj.style.display = ''; // Restore original CSS
+                        // });
+                        // battleDialog.style.display = ''
+                        // battleDialog.innerHTML = ''
+                    }
                 });
                 break;
         }
 
     }
-}
 
+    damageDealt(attack, recipient) {
+        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
+        recipient.health -= attack.damage;
+        recipient.health = recipient.health < 0 ? 0 : recipient.health;
+        const currentHealth = recipient.health + "%"
+        gsap.to(`#${targetHealth} #currentHealth`, {
+            width: currentHealth,
+            onComplete() {
+                if (recipient.health <= 0) {
+                    setTimeout(() => {
+                        gsap.to(recipient, {
+                            opacity: 0
+                        })
+                    }, 200)
+                }
+            }
+        });
+
+
+    }
+}
 
 
 class Boundary {

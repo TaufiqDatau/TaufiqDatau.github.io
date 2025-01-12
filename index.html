@@ -9,6 +9,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="GameData/attack.js"></script>
     <script src="GameData/collision.js"></script>
+    <script src="monster.js"></script>
     <script src="class.js"></script>
     <script defer src="index.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -18,14 +19,15 @@
 <body>
     <div id="mainWrapper">
         <div id="overlappingDiv"
-            style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;">
+            style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;
+            z-index: 5;">
         </div>
         <div id="battleCommand">
-            <div>
-                <button id="tackle">Tackle</button>
-                <button id="fireball">Fireball</button>
+            <div class="battleDialog centerText">
             </div>
-            <div>
+            <div class="activeBattle battleOption">
+            </div>
+            <div class="activeBattle">
                 <h1>Attack Type</h1>
             </div>
         </div>
@@ -41,7 +43,7 @@
                 <div id="currentHealth"></div>
             </div>
         </div>
-        
+
     </div>
     <canvas></canvas>
 </body>
