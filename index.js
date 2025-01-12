@@ -238,7 +238,7 @@ function animate() {
                                                 const textElement = document.querySelector('.centerText');
                                                 const text = "Wild Endo has appeared";
                                                 let index = 0;
-                                                typeWriter(index,text,textElement);
+                                                typeWriter(index, text, textElement);
 
                                             }
                                         });
@@ -256,9 +256,9 @@ function animate() {
 
 
 
-    if(handleTextBoxInteraction(textBox,playerSprite,canvas))return;
+    if (handleTextBoxInteraction(textBox, playerSprite, canvas)) return;
     handleMovement();
-    
+
 }
 
 function handleTextBoxInteraction(textBox, playerSprite, canvas) {
@@ -279,25 +279,25 @@ function handleTextBoxInteraction(textBox, playerSprite, canvas) {
 }
 
 
-function handleMovement(){
+function handleMovement() {
     if (keys.w.pressed) movePlayer('up', 'y', 3)
-     else if (keys.s.pressed) movePlayer('down','y', -3)
-     else if (keys.a.pressed) movePlayer('left','x',3)
-    else if (keys.d.pressed) movePlayer('right','x', -3)
+    else if (keys.s.pressed) movePlayer('down', 'y', -3)
+    else if (keys.a.pressed) movePlayer('left', 'x', 3)
+    else if (keys.d.pressed) movePlayer('right', 'x', -3)
 }
 
 function movePlayer(direction, axis, offset) {
     let moving = true;
     playerSprite.animate = true;
     playerSprite.image = playerSprite.sprites[direction];
-    
+
     for (let boundary of boundaries) {
         const newBoundaryPosition = {
             x: boundary.position.x,
             y: boundary.position.y
         };
         newBoundaryPosition[axis] += offset; // Only update the relevant axis
-        
+
         if (
             rectangularCollision({
                 rectangle1: playerSprite,
@@ -308,13 +308,21 @@ function movePlayer(direction, axis, offset) {
             break;
         }
     }
-    
+
     if (moving) {
         movables.forEach((movable) => {
             movable.position[axis] += offset;
         });
     }
 }
+
+document.querySelectorAll('#battleCommand button').forEach((button) => {
+    button.addEventListener('click', (event) => {
+        monster.attack({ attack: attacks[event.currentTarget.innerHTML], recipient: myMonster, renderedSpritesEffect })
+    });
+});
+
+
 
 
 const battleBackgroundImage = new Image();
@@ -331,49 +339,52 @@ const battleBackground = new Sprite({
     },
     image: battleBackgroundImage
 });
+const bgOriginalWidth = 1024; // Replace with your background's original width
+const bgOriginalHeight = 576; // Replace with your background's original height
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+
+
+// Calculate scale factors
+const scaleX = canvas.width / bgOriginalWidth;
+const scaleY = canvas.height / bgOriginalHeight;
+
+
 const monster = new Sprite({
     position: {
-        x: 0,
-        y: 0,
+        x: bgOriginalWidth * 0.8 * scaleX,
+        y: bgOriginalHeight * 0.2 * scaleY,
     },
     image: monsterImage,
-    frames: {max: 4},
-    animate: true
+    frames: { max: 4 },
+    animate: true,
+    isEnemy: true,
 });
 
 const myMonster = new Sprite({
-    position:{
-        x: 0,
-        y: 0
+    position: {
+        x: bgOriginalWidth * 0.3 * scaleX,
+        y: bgOriginalHeight * 0.6 * scaleY
     },
-    frames: {max: 4},
+    frames: { max: 4 },
     animate: true,
     image: myMonsterImage,
-})
+});
+
+const renderedSpritesEffect = []
 function animateBattle() {
-    const bgOriginalWidth = 1024; // Replace with your background's original width
-    const bgOriginalHeight = 576; // Replace with your background's original height
+
 
     window.requestAnimationFrame(animateBattle);
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
     // Draw the background
     battleBackground.draw(canvas.height, canvas.width);
-
-    // Calculate scale factors
-    const scaleX = canvas.width / bgOriginalWidth;
-    const scaleY = canvas.height / bgOriginalHeight;
-
-    // Position the monsters relative to the original background dimensions
-    monster.position.x = bgOriginalWidth * 0.8 * scaleX; // Adjusted to fixed ratio
-    monster.position.y = bgOriginalHeight * 0.2 * scaleY; // Example Y position
     monster.draw();
-
-    myMonster.position.x = bgOriginalWidth * 0.3 * scaleX; // Adjusted to fixed ratio
-    myMonster.position.y = bgOriginalHeight * 0.6 * scaleY; // Example Y position
     myMonster.draw();
+    renderedSpritesEffect.forEach((effect)=>{
+        effect.draw();
+    })
 }
 
 
@@ -381,7 +392,7 @@ function typeWriter(index, text, textElement) {
     if (index < text.length) {
         textElement.textContent += text[index];
         index++;
-        setTimeout(() => typeWriter(index, text, textElement), 20) 
+        setTimeout(() => typeWriter(index, text, textElement), 20)
     } else {
         // Stop the blinking cursor after typing finishes
         textElement.style.borderRight = "none";

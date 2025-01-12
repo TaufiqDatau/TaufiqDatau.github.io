@@ -7,6 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="GameData/attack.js"></script>
     <script src="GameData/collision.js"></script>
     <script src="class.js"></script>
     <script defer src="index.js"></script>
@@ -15,25 +16,33 @@
 </head>
 
 <body>
-    <div id="overlappingDiv"
-        style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;">
-    </div>
-    <div id="battleCommand">
-        <div>
-            <button>Attack 1</button>
-            <button>Attack 2</button>
+    <div id="mainWrapper">
+        <div id="overlappingDiv"
+            style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;">
         </div>
-        <div>
-            <h1>Attack Type</h1>
+        <div id="battleCommand">
+            <div>
+                <button id="tackle">Tackle</button>
+                <button id="fireball">Fireball</button>
+            </div>
+            <div>
+                <h1>Attack Type</h1>
+            </div>
         </div>
-    </div>
-    <div id="enemyHealthStatus">
-        <div id="enemyName">Cacing Tanah</div>
-        <div id="healthBar">
-            <div id="currentHealth"></div>
+        <div id="enemyHealthStatus">
+            <div id="enemyName">Cacing Tanah</div>
+            <div id="healthBar">
+                <div id="currentHealth"></div>
+            </div>
         </div>
+        <div id="myHealthStatus">
+            <div id="enemyName">Emby</div>
+            <div id="healthBar">
+                <div id="currentHealth"></div>
+            </div>
+        </div>
+        
     </div>
-    
     <canvas></canvas>
 </body>
 

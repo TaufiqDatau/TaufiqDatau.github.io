@@ -133,6 +133,22 @@ canvas {
     left: 30%;
 }
 
+#myHealthStatus {
+    width: 25%; /* Adjust based on preference */
+    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+    border: 4px solid white; /* Sharp border for retro feel */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Glow effect */
+    padding: 10px;
+    font-family: 'rpg', 'Courier New', Courier, monospace; /* Retro font */
+    color: white;
+    margin: 10px auto; /* Center horizontally */
+    text-align: center;
+    box-sizing: border-box;
+    position: absolute; /* For absolute positioning inside */
+    bottom: 225px;
+    right:  50px;
+}
+
 /* Enemy Name */
 #enemyName {
     font-size: 18px;
