@@ -547,7 +547,6 @@ var isJoystickActive = false;
 // Show joystick when user starts interacting (dragging/holding)
 manager.on('start', function (evt, data) {
     if (!isJoystickActive) {
-        console.log('Joystick started, showing joystick');
         const element = document.querySelector('.nipple');
         if(element){
             element.style.display = 'absolute'
@@ -594,7 +593,6 @@ manager.on('dir', function (evt, data) {
 
 // Hide joystick when the user releases (end of interaction)
 manager.on('end', function (evt, data) {
-    console.log('Joystick released, hiding joystick');
     keys.w.pressed = false;
     keys.a.pressed = false;
     keys.s.pressed = false;
