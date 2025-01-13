@@ -249,12 +249,7 @@ function animate() {
                                             width: "calc(100% - 16px)", // Full width of the container
                                             ease: "power3.out", // Smooth easing effect,
                                             onComplete() {
-                                                const textElement = document.querySelector('.battleDialog');
-                                                const text = "Wild Endo has appeared";
-                                                let index = 0;
-                                                typeWriter(index, text, textElement);
                                                 hideDivs()
-
                                             }
                                         });
                                     }
