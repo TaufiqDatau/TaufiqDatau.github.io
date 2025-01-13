@@ -100,8 +100,16 @@ const rise = new Sprite({
     image: RiseImage,
     scale: 2
 })
-const OpeningString = `Hey, hey! 🎤 Welcome to Taufiq personal website—no, wait, scratch that! It’s more like your front-row ticket to an RPG epic starring… drumroll please... a Software Engineering Hero! 🌟 You’re gonna love it here, trust me! The whole site? It’s like a game where you get to explore [Your Name’s] incredible skills and projects. 💻✨
-`
+const OpeningString = `Hello there! Welcome to Taufiq personal website! ` +
+
+`Unlike other websites where you just scroll and browse, here you'll navigate the world like an early RPG game. 🌟 ` +
+`You can move using keyboard WASD keys. ` +
+
+`Feel free to explore, interact with the surroundings, and have fun discovering everything this little world has to offer. Oh, and don’t miss the Monster battle feature—it’s my favorite! 🐾⚔️` +
+
+`Have fun, and let me know what you think! ` +
+`Press Enter to close this text box`
+
 const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
 const battle = {
     initiated: false
@@ -568,6 +576,7 @@ function hideDivs(setDiv='') {
 
 // Initial setup
 hideDivs('none');
+textBox.onDialog = true;
 animate();
 // animateBattle();
 

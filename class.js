@@ -304,7 +304,7 @@ class TextBox {
 
         // Automatically scroll the text if necessary to follow the typewriter effect
         if (this.currentCharIndex < this.content.length) {
-            if (this.elapsed % 2 == 0) {
+            if (this.elapsed % 1 == 0) {
                 this.displayedText += this.content[this.currentCharIndex];
                 this.currentCharIndex++;
 
