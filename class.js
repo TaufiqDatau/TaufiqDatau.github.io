@@ -268,7 +268,7 @@ class TextBox {
 
         // Draw the text box
         c.drawImage(this.textBoxImage, x, y, textBoxWidth, textBoxHeight);
-
+        
         // Set text properties
         c.font = '20px rpg'; // Customize font size and style
         c.fillStyle = 'white'; // Text color
