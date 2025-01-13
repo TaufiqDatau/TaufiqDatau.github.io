@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
+updateCanvasSize();
 
 const image = new Image();
 
@@ -21,6 +22,19 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
+var options = {
+    mode: 'dynamic', // 'static' to have the joystick stay in one place
+    color: 'blue', // Optional: customize the joystick color
+    size: 150, // Optional: customize the joystick size
+    threshold: 0.1 // Optional: adjust sensitivity
+    
+};
+
+var manager = nipplejs.create(options);
+
+
+
+
 
 
 for (i = 0; i < collisionData.length; i += 70) {
@@ -40,10 +54,12 @@ const player = {
     height: 72, // Height of player sprite
 };
 
+
 const offset = {
-    x: -175,
-    y: -1200
-}
+    x: -864 + canvas.width / 2,
+    y: -1656 + canvas.height / 2
+};
+
 
 
 collision.forEach((row, i) => {
@@ -98,17 +114,17 @@ const rise = new Sprite({
         y: 0,
     },
     image: RiseImage,
-    scale: 2
+    scale: 1
 })
 const OpeningString = `Hello there! Welcome to Taufiq personal website! ` +
 
-`Unlike other websites where you just scroll and browse, here you'll navigate the world like an early RPG game. 🌟 ` +
-`You can move using keyboard WASD keys. ` +
+    `Unlike other websites where you just scroll and browse, here you'll navigate the world like an early RPG game. 🌟 ` +
+    `You can move using keyboard WASD keys. ` +
 
-`Feel free to explore, interact with the surroundings, and have fun discovering everything this little world has to offer. Oh, and don’t miss the Monster battle feature—it’s my favorite! 🐾⚔️` +
+    `Feel free to explore, interact with the surroundings, and have fun discovering everything this little world has to offer. Oh, and don’t miss the Monster battle feature—it’s my favorite! 🐾⚔️` +
 
-`Have fun, and let me know what you think! ` +
-`Press Enter to close this text box`
+    `Have fun, and let me know what you think! ` +
+    `Press Enter to close this text box`
 
 const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
 const battle = {
@@ -116,10 +132,12 @@ const battle = {
 }
 
 
+
+
 const playerSprite = new Sprite({
     position: {
-        x: 700,
-        y: 450,
+        x: canvas.width / 2,
+        y: canvas.height / 2,
     },
     image: playerDownImage,
     frames: { max: 4 },
@@ -160,13 +178,19 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
         rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
         rectangle1.position.y + rectangle1.height >= rectangle2.position.y
     )
-}
+};
+
+function updateCanvasSize() {
+    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    canvas.width = viewportWidth;
+    canvas.height = viewportHeight;
+};
 
 const movables = [background, ...boundaries, foreground, ...battleZones]
 function animate() {
     window.requestAnimationFrame(animate)
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    updateCanvasSize();
 
     background.draw()
     // Draw boundaries adjusted for camera movement
@@ -237,13 +261,13 @@ function animate() {
                                     onComplete() {
                                         worm.health = 100;
                                         myMonster.health = 100;
-                                        restoreHealth(worm,100);
-                                        restoreHealth(myMonster,100);
+                                        restoreHealth(worm, 100);
+                                        restoreHealth(myMonster, 100);
                                         resetOpacity(worm);
                                         resetOpacity(myMonster);
                                         const battleCommand = document.querySelector('#battleCommand');
                                         battleCommand.style.display = 'flex';
-                                        
+
                                         gsap.to("#battleCommand", {
                                             duration: 1.5, // Animation duration in seconds
                                             width: "calc(100% - 16px)", // Full width of the container
@@ -283,7 +307,7 @@ function restoreHealth(recipient, maxHealth) {
 
     // Determine the target health bar based on the recipient
     const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus';
-    
+
     // Update the health bar visually
     const currentHealth = recipient.health + "%";
     gsap.to(`#${targetHealth} #currentHealth`, {
@@ -362,23 +386,23 @@ function movePlayer(direction, axis, offset) {
 
 
 
-document.querySelector('.battleDialog').addEventListener('click',(e)=>{
-    if(queue.length > 0){
-        if(worm.health>0)queue[0]();
+document.querySelector('.battleDialog').addEventListener('click', (e) => {
+    if (queue.length > 0) {
+        if (worm.health > 0) queue[0]();
         else e.currentTarget.style.display = 'none'
         queue.shift();
     } else e.currentTarget.style.display = 'none'
 
-    if(worm.health <= 0 || myMonster.health <=0){
-        gsap.to('#overlappingDiv',{
-            opacity:1,
-            onComplete:()=>{
+    if (worm.health <= 0 || myMonster.health <= 0) {
+        gsap.to('#overlappingDiv', {
+            opacity: 1,
+            onComplete: () => {
                 cancelAnimationFrame(battleAnimationId)
                 hideDivs('none');
                 battle.initiated = false;
-                gsap.to('#overlappingDiv',{
-                    opacity:0,
-                    
+                gsap.to('#overlappingDiv', {
+                    opacity: 0,
+
                 })
             }
         })
@@ -428,7 +452,7 @@ const myMonster = new Monster({
     },
 });
 
-myMonster.attacks.forEach((attack)=>{
+myMonster.attacks.forEach((attack) => {
     const Button = document.createElement("button")
     Button.innerHTML = attack.name;
     document.querySelector('.battleOption').append(Button);
@@ -445,7 +469,7 @@ function animateBattle() {
     battleBackground.draw(canvas.height, canvas.width);
     worm.draw();
     myMonster.draw();
-    renderedSpritesEffect.forEach((effect)=>{
+    renderedSpritesEffect.forEach((effect) => {
         effect.draw();
     })
 }
@@ -474,7 +498,6 @@ foregroundImage.src = './img/Foreground_Map.png'
 window.addEventListener('keypress', (e) => {
     switch (e.key) {
         case 'ArrowUp':
-            console.log('up pressed')
             keys.arrowUp.pressed = true;
             break;
         case 'ArrowDown':
@@ -511,6 +534,76 @@ window.addEventListener('keypress', (e) => {
             // Optionally handle other keys or ignore
             break;
     }
+});
+// Initially hide the joystick
+const nippleElement = document.querySelector('.nipple');
+if (nippleElement) {
+    nippleElement.style.display = 'none';
+}
+
+
+var isJoystickActive = false;
+
+// Show joystick when user starts interacting (dragging/holding)
+manager.on('start', function (evt, data) {
+    if (!isJoystickActive) {
+        const element = document.querySelector('.nipple');
+        if(element){
+            element.style.display = 'absolute'
+        }
+        isJoystickActive = true;
+    }
+});
+
+// Handle direction change when dragging the joystick
+manager.on('dir', function (evt, data) {
+    switch (data.direction.angle) {
+        case 'up':
+            keys.w.pressed = true;
+            keys.a.pressed = false;
+            keys.s.pressed = false;
+            keys.d.pressed = false;
+            break;
+        case 'down':
+            keys.w.pressed = false;
+            keys.a.pressed = false;
+            keys.s.pressed = true;
+            keys.d.pressed = false;
+            break;
+        case 'left':
+            keys.w.pressed = false;
+            keys.a.pressed = true;
+            keys.s.pressed = false;
+            keys.d.pressed = false;
+            break;
+        case 'right':
+            keys.w.pressed = false;
+            keys.a.pressed = false;
+            keys.s.pressed = false;
+            keys.d.pressed = true;
+            break;
+        default:
+            keys.w.pressed = false;
+            keys.a.pressed = false;
+            keys.s.pressed = false;
+            keys.d.pressed = false;
+            break;
+    }
+});
+
+// Hide joystick when the user releases (end of interaction)
+manager.on('end', function (evt, data) {
+    keys.w.pressed = false;
+    keys.a.pressed = false;
+    keys.s.pressed = false;
+    keys.d.pressed = false;
+    playerSprite.animate = false; // Stop animation or movement
+    const element = document.querySelector('.nipple');
+        if(element){
+            element.style.display = 'none'
+        }
+    
+    isJoystickActive = false; // Reset the joystick active state
 });
 
 // Key release event listener (optional)
@@ -549,22 +642,22 @@ document.querySelectorAll('#battleCommand button').forEach((button) => {
     button.addEventListener('click', (event) => {
         myMonster.attack({ attack: attacks[event.currentTarget.innerHTML], recipient: worm, renderedSpritesEffect });
 
-        queue.push(()=>{
+        queue.push(() => {
             worm.attack({
                 attack: attacks.Tackle,
-                recipient:myMonster,
+                recipient: myMonster,
                 renderedSpritesEffect
             })
         })
     });
 });
 
-function hideDivs(setDiv='') {
+function hideDivs(setDiv = '') {
     const ids = ["battleCommand", "enemyHealthStatus", "myHealthStatus"];
     ids.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.style.display = setDiv ;
+            element.style.display = setDiv;
         }
     });
 }
@@ -574,7 +667,6 @@ hideDivs('none');
 textBox.onDialog = true;
 animate();
 // animateBattle();
-
 
 
 

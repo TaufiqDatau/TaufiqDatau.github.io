@@ -12,6 +12,8 @@ canvas {
     /* Use the original size of the image */
     background-position: top left;
     /* Align to the top-left corner */
+    height: 100%;
+    width: 100%;
 }
 
 @font-face {
