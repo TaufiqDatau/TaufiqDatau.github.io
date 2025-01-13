@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
+updateCanvasSize();
 
 const image = new Image();
 
@@ -21,6 +22,23 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
+var options = {
+    mode: 'semi', // 'static' to have the joystick stay in one place
+    color: 'blue', // Optional: customize the joystick color
+    size: 150, // Optional: customize the joystick size
+    threshold: 0.1 // Optional: adjust sensitivity
+};
+
+var manager = nipplejs.create(options);
+
+manager.on('dir', function (evt, data) {
+    if (data.direction) {
+        console.log('Direction:', data.direction.angle);
+        // Handle the direction as needed
+    }
+});
+
+
 
 
 for (i = 0; i < collisionData.length; i += 70) {
@@ -40,10 +58,12 @@ const player = {
     height: 72, // Height of player sprite
 };
 
+
 const offset = {
-    x: -175,
-    y: -1200
-}
+    x: -864 + canvas.width/2 ,
+    y: -1656 + canvas.height/2
+};
+
 
 
 collision.forEach((row, i) => {
@@ -116,10 +136,12 @@ const battle = {
 }
 
 
+
+
 const playerSprite = new Sprite({
     position: {
-        x: 700,
-        y: 450,
+        x: canvas.width/2,
+        y: canvas.height/2,
     },
     image: playerDownImage,
     frames: { max: 4 },
@@ -160,13 +182,19 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
         rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
         rectangle1.position.y + rectangle1.height >= rectangle2.position.y
     )
-}
+};
+
+function updateCanvasSize(){
+    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    canvas.width = viewportWidth;
+    canvas.height = viewportHeight;
+};
 
 const movables = [background, ...boundaries, foreground, ...battleZones]
 function animate() {
     window.requestAnimationFrame(animate)
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    updateCanvasSize();
 
     background.draw()
     // Draw boundaries adjusted for camera movement
@@ -474,7 +502,6 @@ foregroundImage.src = './img/Foreground_Map.png'
 window.addEventListener('keypress', (e) => {
     switch (e.key) {
         case 'ArrowUp':
-            console.log('up pressed')
             keys.arrowUp.pressed = true;
             break;
         case 'ArrowDown':
@@ -510,6 +537,12 @@ window.addEventListener('keypress', (e) => {
         default:
             // Optionally handle other keys or ignore
             break;
+    }
+});
+manager.on('dir', function (evt, data) {
+    if (data.direction) {
+        console.log('Direction:', data.direction.angle);
+        // Handle the direction as needed
     }
 });
 
@@ -574,7 +607,6 @@ hideDivs('none');
 textBox.onDialog = true;
 animate();
 // animateBattle();
-
 
 
 
