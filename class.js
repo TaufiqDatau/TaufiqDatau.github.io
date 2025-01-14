@@ -368,4 +368,19 @@ class TextBox {
         this.displayedText = '';
         this.scrollOffset = 0;
     }
+
+    checkClick(mouseX, mouseY) {
+        const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
+        const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
+        const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
+        const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
+        return (
+            mouseX >= x &&
+            mouseX <= x + textBoxWidth &&
+            mouseY >= y &&
+            mouseY <= y + textBoxHeight &&
+            this.onDialog
+        );
+    }
+
 }
