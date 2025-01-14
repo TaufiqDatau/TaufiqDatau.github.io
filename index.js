@@ -652,6 +652,18 @@ document.querySelectorAll('#battleCommand button').forEach((button) => {
     });
 });
 
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    if (textBox.checkClick(mouseX, mouseY)) {
+        textBox.onDialog = false;
+        console.log('TextBox closed.');
+    }
+});
+
+
 function hideDivs(setDiv = '') {
     const ids = ["battleCommand", "enemyHealthStatus", "myHealthStatus"];
     ids.forEach(id => {
