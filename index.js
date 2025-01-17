@@ -1,3 +1,5 @@
+
+
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 updateCanvasSize();
@@ -22,18 +24,18 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png'
 
+
+
 var options = {
+    zone: canvas,
     mode: 'dynamic', // 'static' to have the joystick stay in one place
-    color: 'blue', // Optional: customize the joystick color
+    color: 'grey', // Optional: customize the joystick color
     size: 150, // Optional: customize the joystick size
     threshold: 0.1 // Optional: adjust sensitivity
-    
+
 };
 
 var manager = nipplejs.create(options);
-
-
-
 
 
 
@@ -169,6 +171,9 @@ const keys = {
     arrowDown: {
         pressed: false
     },
+    enter:{
+        pressed: false
+    }
 }
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
@@ -204,7 +209,7 @@ function animate() {
 
     playerSprite.draw();
     foreground.draw();
-    textBox.draw(canvas, rise);
+    // textBox.draw(canvas, rise);
 
     if (battle.initiated) return;
 
@@ -254,6 +259,7 @@ function animate() {
                             backgroundColor: "black", // Resets the color
                             duration: 0.4,
                             onComplete() {
+                                DirectionButton.TriggerButton(false);
                                 animateBattle();
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
@@ -336,13 +342,6 @@ function handleTextBoxInteraction(textBox, playerSprite, canvas) {
     playerSprite.animate = false;
     playerSprite.frames.val = 0;
 
-    // Handle scrolling through the dialog using keys
-    if (keys.w.pressed) {
-        textBox.scroll(5, canvas);
-    } else if (keys.s.pressed) {
-        textBox.scroll(-5, canvas);
-    }
-
     return true; // Interaction handled
 }
 
@@ -387,6 +386,7 @@ function movePlayer(direction, axis, offset) {
 
 
 document.querySelector('.battleDialog').addEventListener('click', (e) => {
+    if(myMonster.isAttacking || worm.isAttacking) return;
     if (queue.length > 0) {
         if (worm.health > 0) queue[0]();
         else e.currentTarget.style.display = 'none'
@@ -397,6 +397,7 @@ document.querySelector('.battleDialog').addEventListener('click', (e) => {
         gsap.to('#overlappingDiv', {
             opacity: 1,
             onComplete: () => {
+                DirectionButton.TriggerButton(true);
                 cancelAnimationFrame(battleAnimationId)
                 hideDivs('none');
                 battle.initiated = false;
@@ -460,9 +461,8 @@ myMonster.attacks.forEach((attack) => {
 
 const renderedSpritesEffect = []
 let battleAnimationId;
+
 function animateBattle() {
-
-
     battleAnimationId = window.requestAnimationFrame(animateBattle);
 
     // Draw the background
@@ -474,17 +474,38 @@ function animateBattle() {
     })
 }
 
+let timeoutId;
 
-function typeWriter(index, text, textElement) {
+function typeWriter(index, text, textElement, containerElement) {
+    if(!textBox.isTalking){
+        clearTimeout(timeoutId);
+    }
+    if (!textBox.onDialog && !battle.initiated) {
+        clearTimeout(timeoutId);
+        textBox.hideDialog();
+        return;
+    }
     if (index < text.length) {
         textElement.textContent += text[index];
         index++;
-        setTimeout(() => typeWriter(index, text, textElement), 20)
+        // Auto-scroll the container to the bottom
+        if (containerElement) {
+            containerElement.scrollTop = containerElement.scrollHeight;
+        }
+        if(keys.enter.pressed){
+            timeoutId = setTimeout(() => typeWriter(index, text, textElement, containerElement), 5)
+        }else{
+            timeoutId = setTimeout(() => typeWriter(index, text, textElement, containerElement), 50)
+        }
+
     } else {
         // Stop the blinking cursor after typing finishes
+        textBox.isTalking = false;
         textElement.style.borderRight = "none";
     }
 }
+
+
 
 
 
@@ -492,149 +513,6 @@ function typeWriter(index, text, textElement) {
 image.src = './img/NewMap.png';
 foregroundImage.src = './img/Foreground_Map.png'
 
-
-
-// Keypress event listener
-window.addEventListener('keypress', (e) => {
-    switch (e.key) {
-        case 'ArrowUp':
-            keys.arrowUp.pressed = true;
-            break;
-        case 'ArrowDown':
-            keys.arrowDown.pressed = true;
-        case 'Enter':
-            textBox.restartText();
-            textBox.onDialog = !textBox.onDialog;
-            break;
-        case 'w':
-            keys.w.pressed = true;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
-            break;
-        case 'a':
-            keys.w.pressed = false;
-            keys.a.pressed = true;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
-            break;
-        case 's':
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = true;
-            keys.d.pressed = false;
-            break;
-        case 'd':
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = true;
-            break;
-        default:
-            // Optionally handle other keys or ignore
-            break;
-    }
-});
-// Initially hide the joystick
-const nippleElement = document.querySelector('.nipple');
-if (nippleElement) {
-    nippleElement.style.display = 'none';
-}
-
-
-var isJoystickActive = false;
-
-// Show joystick when user starts interacting (dragging/holding)
-manager.on('start', function (evt, data) {
-    if (!isJoystickActive) {
-        const element = document.querySelector('.nipple');
-        if(element){
-            element.style.display = 'absolute'
-        }
-        isJoystickActive = true;
-    }
-});
-
-// Handle direction change when dragging the joystick
-manager.on('dir', function (evt, data) {
-    switch (data.direction.angle) {
-        case 'up':
-            keys.w.pressed = true;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
-            break;
-        case 'down':
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = true;
-            keys.d.pressed = false;
-            break;
-        case 'left':
-            keys.w.pressed = false;
-            keys.a.pressed = true;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
-            break;
-        case 'right':
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = true;
-            break;
-        default:
-            keys.w.pressed = false;
-            keys.a.pressed = false;
-            keys.s.pressed = false;
-            keys.d.pressed = false;
-            break;
-    }
-});
-
-// Hide joystick when the user releases (end of interaction)
-manager.on('end', function (evt, data) {
-    keys.w.pressed = false;
-    keys.a.pressed = false;
-    keys.s.pressed = false;
-    keys.d.pressed = false;
-    playerSprite.animate = false; // Stop animation or movement
-    const element = document.querySelector('.nipple');
-        if(element){
-            element.style.display = 'none'
-        }
-    
-    isJoystickActive = false; // Reset the joystick active state
-});
-
-// Key release event listener (optional)
-window.addEventListener('keyup', (e) => {
-    switch (e.key) {
-        case 'ArrowUp':
-            keys.arrowUp.pressed = false;
-            break;
-        case 'ArrowDown':
-            keys.arrowDown.pressed = false;
-            break;
-        case 'w':
-            playerSprite.animate = false;
-            keys.w.pressed = false;
-            break;
-        case 'a':
-            playerSprite.animate = false;
-            keys.a.pressed = false;
-            break;
-        case 's':
-            playerSprite.animate = false;
-            keys.s.pressed = false;
-            break;
-        case 'd':
-            playerSprite.animate = false;
-            keys.d.pressed = false;
-            break;
-        default:
-            break;
-    }
-});
 
 const queue = []
 
@@ -674,10 +552,40 @@ function hideDivs(setDiv = '') {
     });
 }
 
+// Function to recalculate the offset
+function updateOffset() {
+    background.position.x = background.position.x + canvas.width / 2;
+    background.position.y = background.position.y + canvas.height / 2;
+}
+
+// Update canvas size on resize and recalculate offset
+function resizeCanvas() {
+    updateCanvasSize();
+    const oldPosition = {...playerSprite.position};
+    playerSprite.position.x = canvas.width/2;
+    playerSprite.position.y = canvas.height/2;
+    const deltaPositon = {x:playerSprite.position.x - oldPosition.x, y:playerSprite.position.y - oldPosition.y};
+
+    movables.forEach((obj)=>{
+        obj.position.x = obj.position.x + deltaPositon.x;
+        obj.position.y = obj.position.y + deltaPositon.y;
+    })
+}
+
+// Initial setup
+resizeCanvas();
+
+// Listen for window resize
+window.addEventListener('resize', resizeCanvas);
+
+initDirection();
+
 // Initial setup
 hideDivs('none');
-textBox.onDialog = true;
+
 animate();
+textBox.StartDialogue('', OpeningString);
+textBox.startSkipButton();
 // animateBattle();
 
 

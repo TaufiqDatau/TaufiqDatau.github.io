@@ -85,9 +85,8 @@ class Monster extends Sprite {
         rotation = false,
         isEnemy = false,
         name,
-        attacks
+        attacks,
     }) {
-        console.log(image, name)
         super({
             position,
             image,
@@ -100,16 +99,41 @@ class Monster extends Sprite {
         this.health = 100;
         this.isEnemy = isEnemy;
         this.name = name;
-        this.attacks = attacks
+        this.attacks = attacks;
+        this.isAttacking = false;
+
+    }
+
+    damageDealt(attack, recipient) {
+        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
+        recipient.health -= attack.damage;
+        recipient.health = recipient.health < 0 ? 0 : recipient.health;
+        const currentHealth = recipient.health + "%"
+        gsap.to(`#${targetHealth} #currentHealth`, {
+            width: currentHealth,
+            onComplete: () => {
+                if (recipient.health <= 0) {
+                    setTimeout(() => {
+                        gsap.to(recipient, {
+                            opacity: 0
+                        });
+                    }, 200)
+                }
+                this.isAttacking = false;
+                console.log(this.name, this.isAttacking);
+            }
+        });
+
 
     }
 
     attack({ attack, recipient, renderedSpritesEffect }) {
+        this.isAttacking = true;
         const tl = gsap.timeline();
         const battleDialog = document.querySelector('.battleDialog');
         battleDialog.innerHTML = '';
         battleDialog.style.display = 'flex'
-        typeWriter(0, this.name + ' used ' + attack.name, battleDialog);
+        battleDialog.innerHTML = this.name + ' used ' + attack.name;
         switch (attack.name) {
             case 'Fireball':
                 const fireBallImage = new Image();
@@ -187,31 +211,10 @@ class Monster extends Sprite {
                 });
                 break;
         }
-
     }
 
-    damageDealt(attack, recipient) {
-        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
-        recipient.health -= attack.damage;
-        recipient.health = recipient.health < 0 ? 0 : recipient.health;
-        const currentHealth = recipient.health + "%"
-        gsap.to(`#${targetHealth} #currentHealth`, {
-            width: currentHealth,
-            onComplete() {
-                if (recipient.health <= 0) {
-                    setTimeout(() => {
-                        gsap.to(recipient, {
-                            opacity: 0
-                        })
-                    }, 200)
-                }
-            }
-        });
 
-
-    }
 }
-
 
 class Boundary {
     static width = 72;
@@ -250,123 +253,81 @@ class TextBox {
         this.elapsed = 0;
         this.textBoxImage = image
         this.onDialog = false;
+        this.isTalking = false;
+        this.currentText = '';
     }
 
-    draw(canvas, character) {
-        if (!this.onDialog) return;
+    StartDialogue(img, textString) {
+        this.onDialog = !this.onDialog;
+        if (!this.onDialog) {
+            this.hideDialog()
+            return;
+        };
+        this.currentText = textString;
 
-        // Set the dimensions and position of the text box
-        const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
-        const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
-        const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
-        const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
-        if (character) {
-            character.position.x = x;
-            character.position.y = y - character.height;
-            character.draw()
+        const imageElement = document.querySelector('#dialog-box img');
+        const dialogBox = document.querySelector('#dialog-box');
+        const textContent = document.querySelector('.text-content');
+        const containerScroll = document.querySelector('.textbox');
+        textContent.innerHTML = '';
+
+        if (imageElement) {
+            imageElement.src = '/img/Rise.png'; // Change the image source
         }
 
-        // Draw the text box
-        c.drawImage(this.textBoxImage, x, y, textBoxWidth, textBoxHeight);
-        
-        // Set text properties
-        c.font = '20px rpg'; // Customize font size and style
-        c.fillStyle = 'white'; // Text color
-        c.textAlign = 'left';
-
-        // Calculate the text area inside the box
-        const padding = 15; // Padding for text inside the box
-        const textX = x + padding;
-        const textY = y + padding + 25;
-        const textWidth = textBoxWidth - 2 * padding;
-        const lineHeight = 35; // Adjust line height based on font size
-
-        // Wrap the text
-        const lines = this.wrapText(c, this.displayedText, textWidth);
-
-        // Clip the text area to allow scrolling
-        c.save();
-        c.beginPath();
-        c.rect(x + padding, y + padding, textWidth, textBoxHeight);
-        c.clip();
-
-        // Draw visible lines based on scrollOffset
-        let currentY = textY - this.scrollOffset;
-        for (const line of lines) {
-            if (currentY + lineHeight > y + textBoxHeight - padding) break; // Stop if exceeding box height
-            if (currentY + lineHeight > y + padding) {
-                c.fillText(line, textX, currentY);
-            }
-            currentY += lineHeight;
+        if (dialogBox) {
+            dialogBox.style.display = ''; // Make the dialog box visible
+        } else {
+            dialogBox.style.display = 'none'
         }
 
-        c.restore(); // Restore the canvas clipping
-
-        // Automatically scroll the text if necessary to follow the typewriter effect
-        if (this.currentCharIndex < this.content.length) {
-            if (this.elapsed % 1 == 0) {
-                this.displayedText += this.content[this.currentCharIndex];
-                this.currentCharIndex++;
-
-                // Scroll down as new text is added
-                const totalHeight = lines.length * lineHeight;
-                const boxHeight = textBoxHeight - (2 * padding + 25);
-                if (totalHeight > boxHeight) {
-                    const maxScroll = totalHeight - boxHeight;
-                    this.scrollOffset = Math.min(this.scrollOffset + lineHeight, maxScroll);
-                }
-                this.elapsed = 0;
-            }
-            this.elapsed++;
+        if (textContent) {
+            this.isTalking = true;
+            typeWriter(0, textString, textContent, containerScroll);
         }
     }
 
-    wrapText(context, text, maxWidth) {
-        const words = text.split(' '); // Split text into words
-        const lines = [];
-        let currentLine = '';
+    nextButton() {
+        const textContent = document.querySelector('.text-content');
+        const containerScroll = document.querySelector('.textbox');
 
-        for (const word of words) {
-            const testLine = currentLine + word + ' ';
-            const testWidth = context.measureText(testLine).width;
-
-            if (testWidth > maxWidth) {
-                lines.push(currentLine.trim());
-                currentLine = word + ' ';
-            } else {
-                currentLine = testLine;
+        if (this.isTalking) {
+            clearTimeout(timeoutId);
+            textContent.textContent = this.currentText;
+            if (containerScroll) {
+                containerScroll.scrollTop = containerScroll.scrollHeight;
+            }
+            this.isTalking = false;
+        } else {
+            if (this.onDialog) {
+                this.onDialog = false;
+                this.hideDialog();
             }
         }
+    };
 
-        if (currentLine) {
-            lines.push(currentLine.trim());
+    startSkipButton() {
+        document.querySelector('#skip-button').addEventListener('click', ()=>{this.nextButton()});
+    }
+    hideDialog() {
+        const dialogBox = document.querySelector('#dialog-box');
+        const textContent = document.querySelector('.text-content');
+        if (textContent) {
+            textContent.innerHTML = '';
         }
-
-        return lines;
+        dialogBox.style.display = 'none';
+        this.isTalking = false;
     }
+}
 
-    // Scroll the text box manually (for custom scroll behavior)
-    scroll(amount, canvas) {
-        const c = canvas.getContext('2d');
-        if (this.currentCharIndex < this.content.length) return;
-
-        // Calculate the total height of all lines
-        const textBoxWidth = canvas.width * 0.8;
-        const padding = 15;
-        const textWidth = textBoxWidth - 2 * padding;
-        const lineHeight = 30;
-        const lines = this.wrapText(c, this.content, textWidth);
-        const totalHeight = lines.length * lineHeight;
-
-        // Limit scrolling within bounds
-        const maxScroll = Math.max(0, totalHeight - (canvas.height * 0.2 - 2 * 50));
-        this.scrollOffset = Math.max(0, Math.min(this.scrollOffset + amount, maxScroll));
-    }
-
-    restartText() {
-        this.currentCharIndex = 0;
-        this.displayedText = '';
-        this.scrollOffset = 0;
+class DirectionButton {
+    static TriggerButton(shouldAppear) {
+        const controller = document.querySelector(".nes-controller");
+        if (controller && shouldAppear) {
+            controller.style.display = '';
+        } else if (controller) {
+            controller.style.display = 'none';
+        }
     }
 
     checkClick(mouseX, mouseY) {

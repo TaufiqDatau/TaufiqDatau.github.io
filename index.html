@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="direction.js"></script>
     <script src="GameData/attack.js"></script>
     <script src="GameData/collision.js"></script>
     <script src="monster.js"></script>
@@ -17,7 +18,31 @@
     <title>Taufiq Datau</title>
 </head>
 
-<body>
+<body style="margin: 0;">
+    <div class="nes-controller">
+        <button id="up" class="nes-button">↑</button>
+        <div class="horizontal-buttons">
+          <button id="left" class="nes-button">←</button>
+          <button id="right" class="nes-button">→</button>
+        </div>
+        <button id="down" class="nes-button">↓</button>
+      </div>
+    <div class="dialogue-container" id="dialog-box" style="display: none;">
+        <img src="/img/Rise.png" alt="Character" class="character-image" />
+        <div class="dialogue-box">
+            <div class="textbox">
+                <div class="text-content">
+                </div>
+            </div>
+            <button id="skip-button" style="width: fit-content;">
+                Next
+            </button>
+        </div>
+    </div>
+
+   
+      
+      
     <div id="mainWrapper">
         <div id="overlappingDiv"
             style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;
