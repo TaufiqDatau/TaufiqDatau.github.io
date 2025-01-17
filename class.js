@@ -85,9 +85,8 @@ class Monster extends Sprite {
         rotation = false,
         isEnemy = false,
         name,
-        attacks
+        attacks,
     }) {
-        console.log(image, name)
         super({
             position,
             image,
@@ -100,16 +99,41 @@ class Monster extends Sprite {
         this.health = 100;
         this.isEnemy = isEnemy;
         this.name = name;
-        this.attacks = attacks
+        this.attacks = attacks;
+        this.isAttacking = false;
+
+    }
+
+    damageDealt(attack, recipient) {
+        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
+        recipient.health -= attack.damage;
+        recipient.health = recipient.health < 0 ? 0 : recipient.health;
+        const currentHealth = recipient.health + "%"
+        gsap.to(`#${targetHealth} #currentHealth`, {
+            width: currentHealth,
+            onComplete: () => {
+                if (recipient.health <= 0) {
+                    setTimeout(() => {
+                        gsap.to(recipient, {
+                            opacity: 0
+                        });
+                    }, 200)
+                }
+                this.isAttacking = false;
+                console.log(this.name, this.isAttacking);
+            }
+        });
+
 
     }
 
     attack({ attack, recipient, renderedSpritesEffect }) {
+        this.isAttacking = true;
         const tl = gsap.timeline();
         const battleDialog = document.querySelector('.battleDialog');
         battleDialog.innerHTML = '';
         battleDialog.style.display = 'flex'
-        typeWriter(0, this.name + ' used ' + attack.name, battleDialog);
+        battleDialog.innerHTML = this.name + ' used ' + attack.name;
         switch (attack.name) {
             case 'Fireball':
                 const fireBallImage = new Image();
@@ -187,29 +211,9 @@ class Monster extends Sprite {
                 });
                 break;
         }
-
     }
 
-    damageDealt(attack, recipient) {
-        const targetHealth = recipient.isEnemy ? 'enemyHealthStatus' : 'myHealthStatus'
-        recipient.health -= attack.damage;
-        recipient.health = recipient.health < 0 ? 0 : recipient.health;
-        const currentHealth = recipient.health + "%"
-        gsap.to(`#${targetHealth} #currentHealth`, {
-            width: currentHealth,
-            onComplete() {
-                if (recipient.health <= 0) {
-                    setTimeout(() => {
-                        gsap.to(recipient, {
-                            opacity: 0
-                        })
-                    }, 200)
-                }
-            }
-        });
 
-
-    }
 }
 
 class Boundary {
@@ -249,15 +253,17 @@ class TextBox {
         this.elapsed = 0;
         this.textBoxImage = image
         this.onDialog = false;
-        this.isTalking = false
+        this.isTalking = false;
+        this.currentText = '';
     }
 
     StartDialogue(img, textString) {
         this.onDialog = !this.onDialog;
-        if(!this.onDialog) {
+        if (!this.onDialog) {
             this.hideDialog()
             return;
         };
+        this.currentText = textString;
 
         const imageElement = document.querySelector('#dialog-box img');
         const dialogBox = document.querySelector('#dialog-box');
@@ -269,51 +275,57 @@ class TextBox {
             imageElement.src = '/img/Rise.png'; // Change the image source
         }
 
-        if (dialogBox ) {
+        if (dialogBox) {
             dialogBox.style.display = ''; // Make the dialog box visible
         } else {
             dialogBox.style.display = 'none'
         }
 
-        if (textContent ) {
+        if (textContent) {
             this.isTalking = true;
-            typeWriter(0, textString, textContent,containerScroll);
+            typeWriter(0, textString, textContent, containerScroll);
         }
     }
 
-    HideDialogueOnClick() {
-        const dialogBox = document.querySelector('#dialog-box');
+    nextButton() {
         const textContent = document.querySelector('.text-content');
+        const containerScroll = document.querySelector('.textbox');
 
-        if (dialogBox) {
-            dialogBox.addEventListener('click', () => {
-                dialogBox.style.display = 'none'; // Make the dialog box visible
-                if (textContent) {
-                    textContent.innerHTML = '';
-                    this.onDialog = false;
-                }
-            })
+        if (this.isTalking) {
+            clearTimeout(timeoutId);
+            textContent.textContent = this.currentText;
+            if (containerScroll) {
+                containerScroll.scrollTop = containerScroll.scrollHeight;
+            }
+            this.isTalking = false;
+        } else {
+            if (this.onDialog) {
+                this.onDialog = false;
+                this.hideDialog();
+            }
         }
     };
 
+    startSkipButton() {
+        document.querySelector('#skip-button').addEventListener('click', ()=>{this.nextButton()});
+    }
     hideDialog() {
         const dialogBox = document.querySelector('#dialog-box');
         const textContent = document.querySelector('.text-content');
         if (textContent) {
             textContent.innerHTML = '';
         }
-        dialogBox.style.display = 'none'; // Mak
-        // 
-        // e the dialog box visible
+        dialogBox.style.display = 'none';
+        this.isTalking = false;
     }
 }
 
-class DirectionButton{
+class DirectionButton {
     static TriggerButton(shouldAppear) {
         const controller = document.querySelector(".nes-controller");
-        if(controller && shouldAppear){
+        if (controller && shouldAppear) {
             controller.style.display = '';
-        }else if(controller){
+        } else if (controller) {
             controller.style.display = 'none';
         }
     }

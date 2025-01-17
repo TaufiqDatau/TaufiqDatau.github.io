@@ -256,13 +256,13 @@ canvas {
 .dialogue-container {
     position: absolute;
     bottom: 16px;
-    margin-inline: 16px;
+    margin-left: 16px;
     width: 95%;
 }
 
 .dialogue-box {
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     flex-direction: column;
     /* Align items at the top */
     background-color: #192133;
@@ -299,6 +299,7 @@ canvas {
     /* Better text readability */
     overflow-y: auto;
     max-height: inherit;
+    width: 100%;
 }
 
 .text-content {
@@ -433,13 +434,23 @@ canvas {
         color: #ffffff;
         /* Text color */
         font-family: 'rpg', Arial, sans-serif;
-        font-size: 16px;
+        font-size: 12px;
         max-height: 20vh;
+        margin: 0;
     }
 
     .dialogue-box {
         all: unset;
         max-height: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        height: 20vh;
+        width: 100%;
+    }
+
+    #skip-button{
+        font-size: 10px;
     }
 
     .character-image {

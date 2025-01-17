@@ -386,6 +386,7 @@ function movePlayer(direction, axis, offset) {
 
 
 document.querySelector('.battleDialog').addEventListener('click', (e) => {
+    if(myMonster.isAttacking || worm.isAttacking) return;
     if (queue.length > 0) {
         if (worm.health > 0) queue[0]();
         else e.currentTarget.style.display = 'none'
@@ -476,6 +477,9 @@ function animateBattle() {
 let timeoutId;
 
 function typeWriter(index, text, textElement, containerElement) {
+    if(!textBox.isTalking){
+        clearTimeout(timeoutId);
+    }
     if (!textBox.onDialog && !battle.initiated) {
         clearTimeout(timeoutId);
         textBox.hideDialog();
@@ -500,6 +504,8 @@ function typeWriter(index, text, textElement, containerElement) {
         textElement.style.borderRight = "none";
     }
 }
+
+
 
 
 
@@ -534,6 +540,32 @@ function hideDivs(setDiv = '') {
     });
 }
 
+// Function to recalculate the offset
+function updateOffset() {
+    background.position.x = background.position.x + canvas.width / 2;
+    background.position.y = background.position.y + canvas.height / 2;
+}
+
+// Update canvas size on resize and recalculate offset
+function resizeCanvas() {
+    updateCanvasSize();
+    const oldPosition = {...playerSprite.position};
+    playerSprite.position.x = canvas.width/2;
+    playerSprite.position.y = canvas.height/2;
+    const deltaPositon = {x:playerSprite.position.x - oldPosition.x, y:playerSprite.position.y - oldPosition.y};
+
+    movables.forEach((obj)=>{
+        obj.position.x = obj.position.x + deltaPositon.x;
+        obj.position.y = obj.position.y + deltaPositon.y;
+    })
+}
+
+// Initial setup
+resizeCanvas();
+
+// Listen for window resize
+window.addEventListener('resize', resizeCanvas);
+
 initDirection();
 
 // Initial setup
@@ -541,7 +573,7 @@ hideDivs('none');
 
 animate();
 textBox.StartDialogue('', OpeningString);
-textBox.HideDialogueOnClick();
+textBox.startSkipButton();
 // animateBattle();
 
 
