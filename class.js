@@ -212,7 +212,6 @@ class Monster extends Sprite {
     }
 }
 
-
 class Boundary {
     static width = 72;
     static height = 72;
@@ -250,122 +249,72 @@ class TextBox {
         this.elapsed = 0;
         this.textBoxImage = image
         this.onDialog = false;
+        this.isTalking = false
     }
 
-    draw(canvas, character) {
-        if (!this.onDialog) return;
+    StartDialogue(img, textString) {
+        this.onDialog = !this.onDialog;
+        if(!this.onDialog) {
+            this.hideDialog()
+            return;
+        };
 
-        // Set the dimensions and position of the text box
-        const textBoxWidth = canvas.width * 0.8; // Adjust width as needed
-        const textBoxHeight = canvas.height * 0.2; // Adjust height as needed
-        const x = (canvas.width - textBoxWidth) / 2; // Center horizontally
-        const y = canvas.height - textBoxHeight - 10; // Bottom with 10px padding
-        if (character) {
-            character.position.x = x;
-            character.position.y = y - character.height;
-            character.draw()
+        const imageElement = document.querySelector('#dialog-box img');
+        const dialogBox = document.querySelector('#dialog-box');
+        const textContent = document.querySelector('.text-content');
+        const containerScroll = document.querySelector('.textbox');
+        textContent.innerHTML = '';
+
+        if (imageElement) {
+            imageElement.src = '/img/Rise.png'; // Change the image source
         }
 
-        // Draw the text box
-        c.drawImage(this.textBoxImage, x, y, textBoxWidth, textBoxHeight);
-        
-        // Set text properties
-        c.font = '20px rpg'; // Customize font size and style
-        c.fillStyle = 'white'; // Text color
-        c.textAlign = 'left';
-
-        // Calculate the text area inside the box
-        const padding = 15; // Padding for text inside the box
-        const textX = x + padding;
-        const textY = y + padding + 25;
-        const textWidth = textBoxWidth - 2 * padding;
-        const lineHeight = 35; // Adjust line height based on font size
-
-        // Wrap the text
-        const lines = this.wrapText(c, this.displayedText, textWidth);
-
-        // Clip the text area to allow scrolling
-        c.save();
-        c.beginPath();
-        c.rect(x + padding, y + padding, textWidth, textBoxHeight);
-        c.clip();
-
-        // Draw visible lines based on scrollOffset
-        let currentY = textY - this.scrollOffset;
-        for (const line of lines) {
-            if (currentY + lineHeight > y + textBoxHeight - padding) break; // Stop if exceeding box height
-            if (currentY + lineHeight > y + padding) {
-                c.fillText(line, textX, currentY);
-            }
-            currentY += lineHeight;
+        if (dialogBox ) {
+            dialogBox.style.display = ''; // Make the dialog box visible
+        } else {
+            dialogBox.style.display = 'none'
         }
 
-        c.restore(); // Restore the canvas clipping
+        if (textContent ) {
+            this.isTalking = true;
+            typeWriter(0, textString, textContent,containerScroll);
+        }
+    }
 
-        // Automatically scroll the text if necessary to follow the typewriter effect
-        if (this.currentCharIndex < this.content.length) {
-            if (this.elapsed % 1 == 0) {
-                this.displayedText += this.content[this.currentCharIndex];
-                this.currentCharIndex++;
+    HideDialogueOnClick() {
+        const dialogBox = document.querySelector('#dialog-box');
+        const textContent = document.querySelector('.text-content');
 
-                // Scroll down as new text is added
-                const totalHeight = lines.length * lineHeight;
-                const boxHeight = textBoxHeight - (2 * padding + 25);
-                if (totalHeight > boxHeight) {
-                    const maxScroll = totalHeight - boxHeight;
-                    this.scrollOffset = Math.min(this.scrollOffset + lineHeight, maxScroll);
+        if (dialogBox) {
+            dialogBox.addEventListener('click', () => {
+                dialogBox.style.display = 'none'; // Make the dialog box visible
+                if (textContent) {
+                    textContent.innerHTML = '';
+                    this.onDialog = false;
                 }
-                this.elapsed = 0;
-            }
-            this.elapsed++;
+            })
         }
-    }
+    };
 
-    wrapText(context, text, maxWidth) {
-        const words = text.split(' '); // Split text into words
-        const lines = [];
-        let currentLine = '';
-
-        for (const word of words) {
-            const testLine = currentLine + word + ' ';
-            const testWidth = context.measureText(testLine).width;
-
-            if (testWidth > maxWidth) {
-                lines.push(currentLine.trim());
-                currentLine = word + ' ';
-            } else {
-                currentLine = testLine;
-            }
+    hideDialog() {
+        const dialogBox = document.querySelector('#dialog-box');
+        const textContent = document.querySelector('.text-content');
+        if (textContent) {
+            textContent.innerHTML = '';
         }
+        dialogBox.style.display = 'none'; // Mak
+        // 
+        // e the dialog box visible
+    }
+}
 
-        if (currentLine) {
-            lines.push(currentLine.trim());
+class DirectionButton{
+    static TriggerButton(shouldAppear) {
+        const controller = document.querySelector(".nes-controller");
+        if(controller && shouldAppear){
+            controller.style.display = '';
+        }else if(controller){
+            controller.style.display = 'none';
         }
-
-        return lines;
-    }
-
-    // Scroll the text box manually (for custom scroll behavior)
-    scroll(amount, canvas) {
-        const c = canvas.getContext('2d');
-        if (this.currentCharIndex < this.content.length) return;
-
-        // Calculate the total height of all lines
-        const textBoxWidth = canvas.width * 0.8;
-        const padding = 15;
-        const textWidth = textBoxWidth - 2 * padding;
-        const lineHeight = 30;
-        const lines = this.wrapText(c, this.content, textWidth);
-        const totalHeight = lines.length * lineHeight;
-
-        // Limit scrolling within bounds
-        const maxScroll = Math.max(0, totalHeight - (canvas.height * 0.2 - 2 * 50));
-        this.scrollOffset = Math.max(0, Math.min(this.scrollOffset + amount, maxScroll));
-    }
-
-    restartText() {
-        this.currentCharIndex = 0;
-        this.displayedText = '';
-        this.scrollOffset = 0;
     }
 }
