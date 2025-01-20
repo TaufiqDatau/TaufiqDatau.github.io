@@ -1,4 +1,4 @@
-
+const interactButton = document.querySelector('#interact-button');
 
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
@@ -42,6 +42,7 @@ var manager = nipplejs.create(options);
 for (i = 0; i < collisionData.length; i += 70) {
     collision.push(collisionData.slice(i, i + 70));
 }
+
 const boundaries = [];
 const battleZones = [];
 
@@ -61,6 +62,15 @@ const offset = {
     x: -864 + canvas.width / 2,
     y: -1656 + canvas.height / 2
 };
+
+const interactable = new Interactable({
+    position:{
+        x: 700,
+        y: 700
+    },
+    width: 50,
+    height: 50,
+})
 
 
 
@@ -192,7 +202,7 @@ function updateCanvasSize() {
     canvas.height = viewportHeight;
 };
 
-const movables = [background, ...boundaries, foreground, ...battleZones]
+const movables = [background, ...boundaries, foreground, ...battleZones, interactable]
 function animate() {
     window.requestAnimationFrame(animate)
     updateCanvasSize();
@@ -204,14 +214,15 @@ function animate() {
     });
     battleZones.forEach(bz => {
         bz.draw();
-    })
+    });
 
-
+    
+    
     playerSprite.draw();
     foreground.draw();
-    // textBox.draw(canvas, rise);
+    interactable.draw();
 
-    if (battle.initiated) return;
+    if (battle.initiated || isModalOpen) return;
 
     if (keys.a.pressed || keys.w.pressed || keys.s.pressed || keys.d.pressed) {
         for (let i = 0; i < battleZones.length; i++) {
@@ -294,6 +305,16 @@ function animate() {
         }
     }
 
+    if(rectangularCollision({
+        rectangle1:playerSprite,
+        rectangle2:interactable
+    })){
+        interactButton.style.display = '';
+        playerSprite.CanInteract = true;
+    }else{
+        interactButton.style.display = 'none';
+        playerSprite.CanInteract = false;
+    }
 
 
     if (handleTextBoxInteraction(textBox, playerSprite, canvas)) return;
@@ -528,17 +549,6 @@ document.querySelectorAll('#battleCommand button').forEach((button) => {
             })
         })
     });
-});
-
-canvas.addEventListener('click', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    if (textBox.checkClick(mouseX, mouseY)) {
-        textBox.onDialog = false;
-        console.log('TextBox closed.');
-    }
 });
 
 

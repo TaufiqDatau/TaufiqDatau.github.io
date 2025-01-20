@@ -8,7 +8,6 @@ class Sprite {
         sprites,
         animate = false,
         rotation = false,
-
     }) {
         this.position = position;
         this.image = image
@@ -18,6 +17,9 @@ class Sprite {
         this.sprites = sprites;
         this.opacity = 1;
         this.rotation = rotation;
+        this.CanInteract = false;
+        this.interactImage = new Image();
+        this.interactImage.src = `/img/interact.png`;
 
 
         this.image.onload = () => {
@@ -54,6 +56,13 @@ class Sprite {
                 width ?? this.image.width / this.frames.max * this.scale,
                 height ?? this.image.height * this.scale
             );
+            if(this.CanInteract){
+                c.drawImage(
+                    this.interactImage,
+                    this.position.x+5,
+                    this.position.y-20
+                )
+            }
             c.restore()
             // // Draw the border
             // c.strokeStyle = 'red'; // Set the border color
@@ -341,6 +350,35 @@ class DirectionButton {
             mouseY >= y &&
             mouseY <= y + textBoxHeight &&
             this.onDialog
+        );
+    }
+
+}
+
+class Interactable{
+    constructor({position, width, height }){
+        this.position = position;
+        this.width = width;
+        this.height = height;
+    }
+
+    draw(){
+        c.fillStyle = 'red';
+        c.fillRect(
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height
+        );
+    }
+
+    isClicked(clickX, clickY) {
+        // Check if the click is within the interactable bounds
+        return (
+            clickX >= this.position.x &&
+            clickX <= this.position.x + this.width &&
+            clickY >= this.position.y &&
+            clickY <= this.position.y + this.height
         );
     }
 
