@@ -46,7 +46,6 @@ function initDirection() {
 
     // Event listeners for keyboard input
     window.addEventListener('keydown', (e) => {
-        console.log(e.key);
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(e.key)) {
             handleMovementInput(e.key, 'start');
         }

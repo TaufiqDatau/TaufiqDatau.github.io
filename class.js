@@ -56,11 +56,11 @@ class Sprite {
                 width ?? this.image.width / this.frames.max * this.scale,
                 height ?? this.image.height * this.scale
             );
-            if(this.CanInteract){
+            if (this.CanInteract) {
                 c.drawImage(
                     this.interactImage,
-                    this.position.x+5,
-                    this.position.y-20
+                    this.position.x + 5,
+                    this.position.y - 20
                 )
             }
             c.restore()
@@ -129,7 +129,6 @@ class Monster extends Sprite {
                     }, 200)
                 }
                 this.isAttacking = false;
-                console.log(this.name, this.isAttacking);
             }
         });
 
@@ -240,9 +239,6 @@ class Boundary {
     draw() {
 
         c.fillStyle = this.color ?? 'rgba(255, 0, 0, 0)'; // Fully transparent red
-        // c.strokeStyle = 'red'; // Set the border color
-        // c.lineWidth = 2; // Set the border thickness
-        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,
@@ -274,17 +270,19 @@ class TextBox {
         };
         this.currentText = textString;
 
-        const imageElement = document.querySelector('#dialog-box img');
+        // const imageElement = document.querySelector('#dialog-box img');
         const dialogBox = document.querySelector('#dialog-box');
         const textContent = document.querySelector('.text-content');
         const containerScroll = document.querySelector('.textbox');
         textContent.innerHTML = '';
 
-        if (imageElement) {
-            imageElement.src = '/img/Rise.png'; // Change the image source
-        }
+        const characterImage = new Image();
+        characterImage.src = '/img/Rise.png';
+        characterImage.className = 'character-image';
+        characterImage.alt = 'character';
 
         if (dialogBox) {
+            dialogBox.insertBefore(characterImage, dialogBox.firstChild);
             dialogBox.style.display = ''; // Make the dialog box visible
         } else {
             dialogBox.style.display = 'none'
@@ -316,15 +314,17 @@ class TextBox {
     };
 
     startSkipButton() {
-        document.querySelector('#skip-button').addEventListener('click', ()=>{this.nextButton()});
+        document.querySelector('#skip-button').addEventListener('click', () => { this.nextButton() });
     }
     hideDialog() {
         const dialogBox = document.querySelector('#dialog-box');
         const textContent = document.querySelector('.text-content');
+        const image = document.querySelector(`.character-image`);
         if (textContent) {
             textContent.innerHTML = '';
         }
         dialogBox.style.display = 'none';
+        dialogBox.removeChild(image);
         this.isTalking = false;
     }
 }
@@ -355,14 +355,14 @@ class DirectionButton {
 
 }
 
-class Interactable{
-    constructor({position, width, height }){
+class Interactable {
+    constructor({ position, width, height }) {
         this.position = position;
         this.width = width;
         this.height = height;
     }
 
-    draw(){
+    draw() {
         c.fillStyle = 'red';
         c.fillRect(
             this.position.x,
