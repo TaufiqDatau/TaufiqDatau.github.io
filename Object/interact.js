@@ -3,8 +3,17 @@ canvas.addEventListener('click', (event) => {
     const clickX = event.offsetX;
     const clickY = event.offsetY;
 
-    // Check if the interactable is clicked
-    if (interactable.isClicked(clickX, clickY) && playerSprite.CanInteract) {
-        openModal();
-    }
+    // interactables.forEach((interactable) => {
+    //     if (interactable.isClicked(clickX, clickY) && playerSprite.CanInteract) {
+    //         openModal();
+    //     }
+    // });
 });
+
+function dispatchAction(){
+    // interactables.forEach((interactable) => {
+    //     if (interactable.isClicked(clickX, clickY) && playerSprite.CanInteract) {
+    //         openModal();
+    //     }
+    // });
+}

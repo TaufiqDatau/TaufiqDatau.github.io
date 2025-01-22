@@ -22,8 +22,9 @@ playerRightImage.src = './img/playerRight.png';
 const playerLeftImage = new Image();
 playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
-RiseImage.src = './img/Rise.png'
+RiseImage.src = './img/Rise.png';
 
+const actionQueue =[];
 
 
 var options = {
@@ -63,14 +64,26 @@ const offset = {
     y: -1656 + canvas.height / 2
 };
 
-const interactable = new Interactable({
-    position:{
-        x: 700,
-        y: 700
+const interactables = [new Interactable({
+    position: {
+        x: 1220 + offset.x,
+        y: 1880 + offset.y
     },
-    width: 50,
+    width: 80,
     height: 50,
-})
+    actions: [
+        openModal,
+    ]
+}),
+new Interactable({
+    position: {
+        x:3652 + offset.x,
+        y:2020 + offset.y,
+    },
+    width:80,
+    height:160,
+})];
+
 
 
 
@@ -139,6 +152,7 @@ const OpeningString = `Hello there! Welcome to Taufiq personal website! ` +
     `Press Enter to close this text box`
 
 const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
+
 const battle = {
     initiated: false
 }
@@ -181,11 +195,18 @@ const keys = {
     arrowDown: {
         pressed: false
     },
-    enter:{
+    enter: {
         pressed: false
     }
 }
 
+/**
+ * Calculates whether two rectangles are colliding.
+ * @param {Object} options - Contains the two rectangles to check for collision.
+ * @param {Object} options.rectangle1 - The first rectangle.
+ * @param {Object} options.rectangle2 - The second rectangle.
+ * @returns {boolean} True if the rectangles are colliding, false otherwise.
+ */
 function rectangularCollision({ rectangle1, rectangle2 }) {
     return (
         rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -202,7 +223,7 @@ function updateCanvasSize() {
     canvas.height = viewportHeight;
 };
 
-const movables = [background, ...boundaries, foreground, ...battleZones, interactable]
+const movables = [background, ...boundaries, foreground, ...battleZones, ...interactables]
 function animate() {
     window.requestAnimationFrame(animate)
     updateCanvasSize();
@@ -217,11 +238,36 @@ function animate() {
     });
 
     
-    
+
     playerSprite.draw();
     foreground.draw();
-    interactable.draw();
 
+    interactables.forEach((interact)=>{
+        interact.draw();
+    });
+
+    let CanInteract = false; // Initialize as false
+
+    interactables.forEach((interact) => {
+        if (rectangularCollision({
+            rectangle1: playerSprite,
+            rectangle2: interact
+        })) {
+            interactButton.style.display = ''; // Show button
+            CanInteract = true; // Set to true if at least one condition is satisfied
+        }
+    });
+    
+    // Hide the button if no interactable satisfies the condition
+    if (!CanInteract) {
+        interactButton.style.display = 'none';
+    }
+    
+    // Update the playerSprite's CanInteract property
+    playerSprite.CanInteract = CanInteract;
+    
+   
+    
     if (battle.initiated || isModalOpen) return;
 
     if (keys.a.pressed || keys.w.pressed || keys.s.pressed || keys.d.pressed) {
@@ -305,16 +351,8 @@ function animate() {
         }
     }
 
-    if(rectangularCollision({
-        rectangle1:playerSprite,
-        rectangle2:interactable
-    })){
-        interactButton.style.display = '';
-        playerSprite.CanInteract = true;
-    }else{
-        interactButton.style.display = 'none';
-        playerSprite.CanInteract = false;
-    }
+    
+
 
 
     if (handleTextBoxInteraction(textBox, playerSprite, canvas)) return;
@@ -407,7 +445,7 @@ function movePlayer(direction, axis, offset) {
 
 
 document.querySelector('.battleDialog').addEventListener('click', (e) => {
-    if(myMonster.isAttacking || worm.isAttacking) return;
+    if (myMonster.isAttacking || worm.isAttacking) return;
     if (queue.length > 0) {
         if (worm.health > 0) queue[0]();
         else e.currentTarget.style.display = 'none'
@@ -497,8 +535,8 @@ function animateBattle() {
 
 let timeoutId;
 
-function typeWriter(index, text, textElement, containerElement) {
-    if(!textBox.isTalking){
+function typeWriter(index, text, textElement, containerElement,obj) {
+    if (!textBox.isTalking) {
         clearTimeout(timeoutId);
     }
     if (!textBox.onDialog && !battle.initiated) {
@@ -513,9 +551,9 @@ function typeWriter(index, text, textElement, containerElement) {
         if (containerElement) {
             containerElement.scrollTop = containerElement.scrollHeight;
         }
-        if(keys.enter.pressed){
+        if (keys.enter.pressed) {
             timeoutId = setTimeout(() => typeWriter(index, text, textElement, containerElement), 5)
-        }else{
+        } else {
             timeoutId = setTimeout(() => typeWriter(index, text, textElement, containerElement), 50)
         }
 
@@ -562,39 +600,64 @@ function hideDivs(setDiv = '') {
     });
 }
 
-// Function to recalculate the offset
-function updateOffset() {
-    background.position.x = background.position.x + canvas.width / 2;
-    background.position.y = background.position.y + canvas.height / 2;
-}
 
 // Update canvas size on resize and recalculate offset
 function resizeCanvas() {
     updateCanvasSize();
-    const oldPosition = {...playerSprite.position};
-    playerSprite.position.x = canvas.width/2;
-    playerSprite.position.y = canvas.height/2;
-    const deltaPositon = {x:playerSprite.position.x - oldPosition.x, y:playerSprite.position.y - oldPosition.y};
+    const oldPosition = { ...playerSprite.position };
+    playerSprite.position.x = canvas.width / 2;
+    playerSprite.position.y = canvas.height / 2;
+    const deltaPositon = { x: playerSprite.position.x - oldPosition.x, y: playerSprite.position.y - oldPosition.y };
 
-    movables.forEach((obj)=>{
+    movables.forEach((obj) => {
         obj.position.x = obj.position.x + deltaPositon.x;
         obj.position.y = obj.position.y + deltaPositon.y;
     })
 }
 
+function initActionQueue(){
+    const talkingDialog = {
+        action: "talking",
+        text: "Hello there! Welcome to Taufiq personal website! ",
+        fn : textBox.StartDialogue.bind(textBox),
+        character : './img/Rise.png',
+    };
+    const talkingDialog2 = {
+        action: "talking",
+        text: `You can walk around with WASD or arrow buttons` ,
+        fn : textBox.StartDialogue.bind(textBox),
+        character : './img/Emby.png',
+    }
+    actionQueue.push(talkingDialog);
+    actionQueue.push(talkingDialog2);
+}
+
+function dispatchEvent(){
+    if(actionQueue.length == 0) return;
+
+    const event = actionQueue.shift();
+    switch(event.action){
+        case "talking":
+            event.fn(event.character, event.text);
+            break;
+    }
+}
+
 // Initial setup
 resizeCanvas();
+initDirection();
+initActionQueue();
 
 // Listen for window resize
 window.addEventListener('resize', resizeCanvas);
 
-initDirection();
 
 // Initial setup
 hideDivs('none');
 
 animate();
-textBox.StartDialogue('', OpeningString);
+dispatchEvent();
+// textBox.StartDialogue('./img/Rise.png', 'Hello there! Welcome to Taufiq personal website!');
 textBox.startSkipButton();
 // animateBattle();
 

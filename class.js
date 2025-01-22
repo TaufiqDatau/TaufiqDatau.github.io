@@ -57,6 +57,7 @@ class Sprite {
                 height ?? this.image.height * this.scale
             );
             if (this.CanInteract) {
+                console.log('interact image')
                 c.drawImage(
                     this.interactImage,
                     this.position.x + 5,
@@ -263,11 +264,8 @@ class TextBox {
     }
 
     StartDialogue(img, textString) {
-        this.onDialog = !this.onDialog;
-        if (!this.onDialog) {
-            this.hideDialog()
-            return;
-        };
+        console.log('dialog starting');
+        this.onDialog = true;
         this.currentText = textString;
 
         // const imageElement = document.querySelector('#dialog-box img');
@@ -290,7 +288,7 @@ class TextBox {
 
         if (textContent) {
             this.isTalking = true;
-            typeWriter(0, textString, textContent, containerScroll);
+            typeWriter(0, textString, textContent, containerScroll, this);
         }
     }
 
@@ -309,6 +307,7 @@ class TextBox {
             if (this.onDialog) {
                 this.onDialog = false;
                 this.hideDialog();
+                dispatchEvent();
             }
         }
     };
@@ -356,20 +355,24 @@ class DirectionButton {
 }
 
 class Interactable {
-    constructor({ position, width, height }) {
+    constructor({ position, width, height, actions }) {
         this.position = position;
         this.width = width;
         this.height = height;
+        this.actions = actions;
     }
 
     draw() {
         c.fillStyle = 'red';
-        c.fillRect(
-            this.position.x,
-            this.position.y,
-            this.width,
-            this.height
-        );
+        // c.fillRect(
+        //     this.position.x,
+        //     this.position.y,
+        //     this.width,
+        //     this.height
+        // );
+        c.strokeStyle = 'red'; // Set the border color
+        c.lineWidth = 2; // Set the border thickness
+        c.strokeRect(this.position.x, this.position.y, this.width, this.height);
     }
 
     isClicked(clickX, clickY) {
@@ -381,5 +384,6 @@ class Interactable {
             clickY <= this.position.y + this.height
         );
     }
+
 
 }

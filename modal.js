@@ -35,6 +35,8 @@ function closeModal() {
 
 function openModal(){
     currentSlide =0;
-    document.getElementById('modal-overlay').style.display = '';
+    const overlay= document.getElementById('modal-overlay');
+    overlay.style.display = '';
+    overlay.scrollTop = 0;
     isModalOpen =true;
 }
