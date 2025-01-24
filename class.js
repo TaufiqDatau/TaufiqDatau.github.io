@@ -363,14 +363,14 @@ class Interactable {
     }
 
     draw() {
-        c.fillStyle = 'red';
+        // c.fillStyle = 'red';
         // c.fillRect(
         //     this.position.x,
         //     this.position.y,
         //     this.width,
         //     this.height
         // );
-        c.strokeStyle = 'red'; // Set the border color
+        c.strokeStyle = 'rgba(255, 0, 0, 0)'; // Set the border color
         c.lineWidth = 2; // Set the border thickness
         c.strokeRect(this.position.x, this.position.y, this.width, this.height);
     }

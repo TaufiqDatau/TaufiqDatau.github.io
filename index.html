@@ -67,8 +67,17 @@
         </div>
 
     </div>
+    <!-- <div style="position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%); font-family: 'rpg'; color: #ffffff; width: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; text-align: center; height: 140px; padding: 20px;">
+        <div style="text-align: center; width: 100%;">
+            <div style="font-size: 50px;">TAUFIQURRAHMAN HAFIIDH DATAU</div>
+            <div style="font-size: 20px; margin-top: 10px; text-align: right; margin-right: 50px;">software engineer</div>
+        </div>
+    </div> -->
+    
+    
+
     <div class="modal-buttons game-button" id="interact-button">
-        <button onclick="dispatchAction()">
+        <button onclick="interactAction()">
             Interact
         </button>
     </div>
@@ -76,35 +85,22 @@
 
     <div class="modal-overlay" id="modal-overlay" style="display: none;">
         <div class="modal">
-            <div class="modal-title">KOPRA BY MANDIRI</div>
+            <div class="modal-title" id="modal-title">
+                <!-- insert title here -->
+            </div>
 
             <!-- Image Carousel -->
             <div class="modal-carousel">
                 <div class="carousel-images" id="carousel-images">
-                    <img src="img/portofolio/KOPRA1.png" alt="Image 1">
-                    <img src="img/portofolio/KOPRA2.png" alt="Image 2">
-                    <img src="img/portofolio/KOPRA3.png" alt="Image 3">
+                    <!-- Inser Images here -->
                 </div>
                 <button class="carousel-button prev" onclick="prevSlide()">&#9664;</button>
                 <button class="carousel-button next" onclick="nextSlide()">&#9654;</button>
             </div>
 
             <!-- Description -->
-            <div class="modal-description">
-                <p>
-                    <strong>KOPRA by Mandiri</strong> is a supply chain management platform developed to streamline
-                    transactions for principals, suppliers, and distributors.
-                </p>
-                <p>
-                    As a Frontend Developer on this project, my primary focus was on building and enhancing the supply
-                    chain UI using <strong>Angular 16</strong>. I was responsible for creating web logic to ensure
-                    smooth user interactions and managing shared internal UI components to maintain consistency across
-                    the platform.
-                </p>
-                <p>
-                    My contributions also included improving and optimizing various features to deliver a seamless user
-                    experience, meeting the expectations of diverse stakeholders in the supply chain ecosystem.
-                </p>
+            <div class="modal-description" id="modal-description">
+                <!-- Insert Description Here -->
             </div>
 
             <!-- Buttons -->

@@ -24,7 +24,8 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png';
 
-const actionQueue =[];
+const actionQueue = [];
+let currentInteractable;
 
 
 var options = {
@@ -72,17 +73,65 @@ const interactables = [new Interactable({
     width: 80,
     height: 50,
     actions: [
-        openModal,
+        {
+            action: "modal",
+            title: "KOPRA by Mandiri",
+            images: [
+                {
+                    src: "img/portofolio/KOPRA1.png",
+                    alt: "KOPRA Homepage",
+                },
+                {
+                    src: "img/portofolio/KOPRA2.png",
+                    alt: "KOPRA About",
+                },
+                {
+                    src: "img/portofolio/KOPRA3.png",
+                    alt: "KOPRA Contact",
+                }
+            ],
+            content: `<p>
+            <strong>KOPRA by Mandiri</strong> is a supply chain management platform developed to streamline
+            transactions for principals, suppliers, and distributors.
+        </p>
+        <p>
+            As a Frontend Developer on this project, my primary focus was on building and enhancing the supply
+            chain UI using <strong>Angular 16</strong>. I was responsible for creating web logic to ensure
+            smooth user interactions and managing shared internal UI components to maintain consistency across
+            the platform.
+        </p>
+        <p>
+            My contributions also included improving and optimizing various features to deliver a seamless user
+            experience, meeting the expectations of diverse stakeholders in the supply chain ecosystem.
+        </p>`,
+
+        }
     ]
 }),
 new Interactable({
     position: {
-        x:3652 + offset.x,
-        y:2020 + offset.y,
+        x: 3652 + offset.x,
+        y: 2020 + offset.y,
     },
-    width:80,
-    height:160,
+    width: 80,
+    height: 160,
 })];
+
+function handleModalEvent(e) {
+    const title = document.querySelector('#modal-title');
+    const carrouselImages = document.querySelector('#carousel-images');
+    const description = document.querySelector('#modal-description');
+
+    title.innerHTML = e.title;
+    carrouselImages.innerHTML = '';
+    e.images.forEach(image => {
+        const img = document.createElement('img');
+        img.src = image.src;
+        img.alt = image.alt;
+        carrouselImages.appendChild(img);
+    });
+    description.innerHTML = e.content;
+}
 
 
 
@@ -237,12 +286,12 @@ function animate() {
         bz.draw();
     });
 
-    
+
 
     playerSprite.draw();
     foreground.draw();
 
-    interactables.forEach((interact)=>{
+    interactables.forEach((interact) => {
         interact.draw();
     });
 
@@ -253,21 +302,23 @@ function animate() {
             rectangle1: playerSprite,
             rectangle2: interact
         })) {
+            currentInteractable = interact;
             interactButton.style.display = ''; // Show button
             CanInteract = true; // Set to true if at least one condition is satisfied
         }
     });
-    
+
     // Hide the button if no interactable satisfies the condition
     if (!CanInteract) {
+        currentInteractable = null;
         interactButton.style.display = 'none';
     }
-    
+
     // Update the playerSprite's CanInteract property
     playerSprite.CanInteract = CanInteract;
-    
-   
-    
+
+
+
     if (battle.initiated || isModalOpen) return;
 
     if (keys.a.pressed || keys.w.pressed || keys.s.pressed || keys.d.pressed) {
@@ -351,7 +402,7 @@ function animate() {
         }
     }
 
-    
+
 
 
 
@@ -535,7 +586,7 @@ function animateBattle() {
 
 let timeoutId;
 
-function typeWriter(index, text, textElement, containerElement,obj) {
+function typeWriter(index, text, textElement, containerElement, obj) {
     if (!textBox.isTalking) {
         clearTimeout(timeoutId);
     }
@@ -615,31 +666,46 @@ function resizeCanvas() {
     })
 }
 
-function initActionQueue(){
+function initActionQueue() {
     const talkingDialog = {
         action: "talking",
         text: "Hello there! Welcome to Taufiq personal website! ",
-        fn : textBox.StartDialogue.bind(textBox),
-        character : './img/Rise.png',
+        fn: textBox.StartDialogue.bind(textBox),
+        character: './img/Rise.png',
     };
     const talkingDialog2 = {
         action: "talking",
-        text: `You can walk around with WASD or arrow buttons` ,
-        fn : textBox.StartDialogue.bind(textBox),
-        character : './img/Emby.png',
+        text: `You can walk around with WASD or arrow buttons`,
+        fn: textBox.StartDialogue.bind(textBox),
+        character: './img/Emby.png',
     }
     actionQueue.push(talkingDialog);
     actionQueue.push(talkingDialog2);
 }
 
-function dispatchEvent(){
-    if(actionQueue.length == 0) return;
+function interactAction() {
+    const actions = currentInteractable.actions;
+    //put all of the actions into the action queue
+    actions.forEach((action) => {
+        actionQueue.push(action);
+    });
+
+    dispatchEvent();
+}
+
+function dispatchEvent() {
+    if (actionQueue.length == 0) return;
 
     const event = actionQueue.shift();
-    switch(event.action){
+    switch (event.action) {
         case "talking":
             event.fn(event.character, event.text);
             break;
+        case "modal":
+            handleModalEvent(event);
+            openModal();
+            break;
+
     }
 }
 
