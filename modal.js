@@ -29,6 +29,7 @@ function nextSlide() {
 
 function closeModal() {
     document.getElementById('modal-overlay').style.display = 'none';
+    document.getElementById('carousel-images').style.transform = 'translateX(0%)';
     currentSlide = 0;
     isModalOpen = false;
 }
