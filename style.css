@@ -258,6 +258,7 @@ canvas {
     bottom: 16px;
     margin-left: 16px;
     width: 95%;
+    z-index: 1;
 }
 
 .dialogue-box {
@@ -289,6 +290,7 @@ canvas {
     margin-right: 15px;
     /* Space between the image and text */
     border: none;
+    max-height: 500px;
     /* Optional: remove any default border */
 }
 
@@ -547,7 +549,8 @@ canvas {
 .game-button{
     position: absolute;
     left: 25px;
-    bottom: 10px;
+    bottom: 25px;
+    
 }
 
 @media screen and (max-width: 768px),(max-height:768px) {

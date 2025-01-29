@@ -24,6 +24,21 @@ playerLeftImage.src = './img/playerLeft.png';
 const RiseImage = new Image();
 RiseImage.src = './img/Rise.png';
 
+const myImage = new Image();
+myImage.src = './img/myself.png';
+
+const OpeningString = `Hello there! Welcome to Taufiq personal website! ` +
+
+    `Unlike other websites where you just scroll and browse, here you'll navigate the world like an early RPG game. 🌟 ` +
+    `You can move using keyboard WASD keys. ` +
+
+    `Feel free to explore, interact with the surroundings, and have fun discovering everything this little world has to offer. Oh, and don’t miss the Monster battle feature—it’s my favorite! 🐾⚔️` +
+
+    `Have fun, and let me know what you think! ` +
+    `Press Enter to close this text box`
+
+const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
+
 const actionQueue = [];
 let currentInteractable;
 
@@ -65,7 +80,36 @@ const offset = {
     y: -1656 + canvas.height / 2
 };
 
-const interactables = [new Interactable({
+const interactables = [
+    new Interactable({
+        position: {
+            x: 792 + offset.x,
+            y: 1750 + offset.y
+        },
+        width: 80,
+        height: 90,
+        actions: [
+            {
+                action: "talking",
+                text: `Hi, I’m Taufiq, a software engineer with experience in Golang, JavaScript, and TypeScript. I’ve worked on both frontend and backend development, but I have a strong interest in backend engineering, especially with Golang.`,
+                fn: textBox.StartDialogue.bind(textBox),
+                character: './img/nipon.gif',
+            },
+            {
+                action: "talking",
+                text: `I’ve contributed to building web applications, handling APIs, and working with technologies like Docker and Kubernetes for deployment. I enjoy solving complex problems and optimizing systems for performance and scalability.`,
+                fn: textBox.StartDialogue.bind(textBox),
+                character: './img/nipon.gif',
+            },
+            {
+                action: "talking",
+                text: `What do you want to know more about me?`,
+                fn: textBox.StartDialogue.bind(textBox),
+                character: './img/nipon.gif',
+            }
+        ]
+    })
+    ,new Interactable({
     position: {
         x: 1220 + offset.x,
         y: 1880 + offset.y
@@ -189,18 +233,16 @@ const rise = new Sprite({
     },
     image: RiseImage,
     scale: 1
+});
+const myself = new Sprite({
+    position: {
+        x: 792 + offset.x,
+        y: 1750 + offset.y
+    },
+    image: myImage
 })
-const OpeningString = `Hello there! Welcome to Taufiq personal website! ` +
+    
 
-    `Unlike other websites where you just scroll and browse, here you'll navigate the world like an early RPG game. 🌟 ` +
-    `You can move using keyboard WASD keys. ` +
-
-    `Feel free to explore, interact with the surroundings, and have fun discovering everything this little world has to offer. Oh, and don’t miss the Monster battle feature—it’s my favorite! 🐾⚔️` +
-
-    `Have fun, and let me know what you think! ` +
-    `Press Enter to close this text box`
-
-const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
 
 const battle = {
     initiated: false
@@ -272,7 +314,7 @@ function updateCanvasSize() {
     canvas.height = viewportHeight;
 };
 
-const movables = [background, ...boundaries, foreground, ...battleZones, ...interactables]
+const movables = [background, ...boundaries, foreground, ...battleZones, ...interactables,myself]
 function animate() {
     window.requestAnimationFrame(animate)
     updateCanvasSize();
@@ -288,6 +330,7 @@ function animate() {
 
 
 
+    myself.draw();
     playerSprite.draw();
     foreground.draw();
 
@@ -677,7 +720,7 @@ function initActionQueue() {
         action: "talking",
         text: `You can walk around with WASD or arrow buttons`,
         fn: textBox.StartDialogue.bind(textBox),
-        character: './img/Emby.png',
+        character: './img/Rise.png',
     }
     actionQueue.push(talkingDialog);
     actionQueue.push(talkingDialog2);

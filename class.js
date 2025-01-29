@@ -275,21 +275,24 @@ class TextBox {
         textContent.innerHTML = '';
 
         const characterImage = new Image();
-        characterImage.src = '/img/Rise.png';
+        characterImage.src = img;
         characterImage.className = 'character-image';
         characterImage.alt = 'character';
 
-        if (dialogBox) {
-            dialogBox.insertBefore(characterImage, dialogBox.firstChild);
-            dialogBox.style.display = ''; // Make the dialog box visible
-        } else {
-            dialogBox.style.display = 'none'
+        characterImage.onload = () => {
+            if (dialogBox) {
+                dialogBox.insertBefore(characterImage, dialogBox.firstChild);
+                dialogBox.style.display = ''; // Make the dialog box visible
+            } else {
+                dialogBox.style.display = 'none'
+            }
+    
+            if (textContent) {
+                this.isTalking = true;
+                typeWriter(0, textString, textContent, containerScroll, this);
+            }
         }
 
-        if (textContent) {
-            this.isTalking = true;
-            typeWriter(0, textString, textContent, containerScroll, this);
-        }
     }
 
     nextButton() {
@@ -370,7 +373,7 @@ class Interactable {
         //     this.width,
         //     this.height
         // );
-        c.strokeStyle = 'rgba(255, 0, 0, 0)'; // Set the border color
+        c.strokeStyle = 'red' //'rgba(255, 0, 0, 0)'; // Set the border color
         c.lineWidth = 2; // Set the border thickness
         c.strokeRect(this.position.x, this.position.y, this.width, this.height);
     }
