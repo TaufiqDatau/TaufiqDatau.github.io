@@ -308,6 +308,7 @@ canvas {
     display: inline-block;
     position: relative;
 }
+
 .text-content::after {
     content: "";
     display: inline-block;
@@ -317,10 +318,14 @@ canvas {
     background-color: white;
     animation: blink 1s infinite;
 }
+
 @keyframes blink {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0;
     }
@@ -546,14 +551,86 @@ canvas {
     background-color: #545466;
 }
 
-.game-button{
+.game-button {
     position: absolute;
     left: 25px;
     bottom: 25px;
-    
+
 }
 
-@media screen and (max-width: 768px),(max-height:768px) {
+/* body {
+
+    background-color: #1e1e2e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+} */
+
+.option-box {
+    font-family: monospace;
+    position: absolute;
+    background-color: #0f172a;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    font-size: 18px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+    /* Centering */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.options-container {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.option-btn {
+    background-color: #1e293b;
+    color: white;
+    border: 2px solid #334155;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.option-btn:hover {
+    background-color: #475569;
+    border-color: white;
+}
+
+.option-btn.active {
+    border-color: white;
+}
+
+@media (max-width: 400px) {
+    .option-box {
+        font-size: 16px;
+    }
+
+    .option-btn {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
+
+@media screen and (max-width: 768px),
+(max-height:768px) {
     .dialogue-container {
         display: flex;
         display: flex;
@@ -586,7 +663,7 @@ canvas {
         width: 100%;
     }
 
-    #skip-button{
+    #skip-button {
         font-size: 10px;
     }
 
@@ -625,4 +702,3 @@ canvas {
         font-size: 12px;
     }
 }
-

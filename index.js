@@ -41,6 +41,7 @@ const textBox = new TextBox({ str: OpeningString, image: textBoxImage });
 
 const actionQueue = [];
 let currentInteractable;
+let interacting = false;
 
 
 var options = {
@@ -727,6 +728,9 @@ function initActionQueue() {
 }
 
 function interactAction() {
+    if (interacting) return;
+    interacting = true;
+
     const actions = currentInteractable.actions;
     //put all of the actions into the action queue
     actions.forEach((action) => {
@@ -737,7 +741,10 @@ function interactAction() {
 }
 
 function dispatchEvent() {
-    if (actionQueue.length == 0) return;
+    if (actionQueue.length == 0) {
+        interacting = false;
+        return;
+    }
 
     const event = actionQueue.shift();
     switch (event.action) {
@@ -769,6 +776,8 @@ dispatchEvent();
 // textBox.StartDialogue('./img/Rise.png', 'Hello there! Welcome to Taufiq personal website!');
 textBox.startSkipButton();
 // animateBattle();
+
+openOptionBox();
 
 
 
