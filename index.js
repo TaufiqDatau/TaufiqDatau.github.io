@@ -107,6 +107,11 @@ const interactables = [
                 text: `What do you want to know more about me?`,
                 fn: textBox.StartDialogue.bind(textBox),
                 character: './img/nipon.gif',
+            },
+            {
+                action: "options",
+                text: "what do you want to do next?",
+                fn: openOptionBox,
             }
         ]
     })
@@ -755,6 +760,12 @@ function dispatchEvent() {
             handleModalEvent(event);
             openModal();
             break;
+        case "download":
+            handlePdf(event.action, event.url);
+            break;
+        case "options":
+            event.fn(event.text);
+            break;
 
     }
 }
@@ -777,7 +788,7 @@ dispatchEvent();
 textBox.startSkipButton();
 // animateBattle();
 
-openOptionBox();
+
 
 
 
