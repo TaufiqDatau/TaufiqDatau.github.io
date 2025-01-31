@@ -8,12 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="modal.js"></script>
     <script src="direction.js"></script>
     <script src="GameData/attack.js"></script>
+    <script src="pdf.js"></script>
     <script src="GameData/collision.js"></script>
     <script src="monster.js"></script>
     <script src="class.js"></script>
+    <script src="option-box.js"></script>
     <script defer src="index.js"></script>
+    <script defer src="Object/interact.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>Taufiq Datau</title>
 </head>
@@ -22,13 +26,12 @@
     <div class="nes-controller">
         <button id="up" class="nes-button">↑</button>
         <div class="horizontal-buttons">
-          <button id="left" class="nes-button">←</button>
-          <button id="right" class="nes-button">→</button>
+            <button id="left" class="nes-button">←</button>
+            <button id="right" class="nes-button">→</button>
         </div>
         <button id="down" class="nes-button">↓</button>
-      </div>
+    </div>
     <div class="dialogue-container" id="dialog-box" style="display: none;">
-        <img src="/img/Rise.png" alt="Character" class="character-image" />
         <div class="dialogue-box">
             <div class="textbox">
                 <div class="text-content">
@@ -39,13 +42,8 @@
             </button>
         </div>
     </div>
-
-   
-      
-      
     <div id="mainWrapper">
-        <div id="overlappingDiv"
-            style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;
+        <div id="overlappingDiv" style="height: 100%; width: 100%; background-color: black; position: absolute; opacity: 0; pointer-events: none;
             z-index: 5;">
         </div>
         <div id="battleCommand">
@@ -71,7 +69,51 @@
         </div>
 
     </div>
+    <!-- <div style="position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%); font-family: 'rpg'; color: #ffffff; width: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; text-align: center; height: 140px; padding: 20px;">
+        <div style="text-align: center; width: 100%;">
+            <div style="font-size: 50px;">TAUFIQURRAHMAN HAFIIDH DATAU</div>
+            <div style="font-size: 20px; margin-top: 10px; text-align: right; margin-right: 50px;">software engineer</div>
+        </div>
+    </div> -->
+    
+    
+
+    <div class="modal-buttons game-button" id="interact-button">
+        <button onclick="interactAction()">
+            Interact
+        </button>
+    </div>
     <canvas></canvas>
+
+    <div class="modal-overlay" id="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-title" id="modal-title">
+                <!-- insert title here -->
+            </div>
+
+            <!-- Image Carousel -->
+            <div class="modal-carousel">
+                <div class="carousel-images" id="carousel-images">
+                    <!-- Inser Images here -->
+                </div>
+                <button class="carousel-button prev" onclick="prevSlide()">&#9664;</button>
+                <button class="carousel-button next" onclick="nextSlide()">&#9654;</button>
+            </div>
+
+            <!-- Description -->
+            <div class="modal-description" id="modal-description">
+                <!-- Insert Description Here -->
+            </div>
+
+            <!-- Buttons -->
+            <div class="modal-buttons">
+                <button onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="option-box" style="display: none;">
+        <div class="options-container" id="optionsContainer"></div>
+    </div>
 </body>
 
 </html>

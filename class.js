@@ -8,7 +8,6 @@ class Sprite {
         sprites,
         animate = false,
         rotation = false,
-
     }) {
         this.position = position;
         this.image = image
@@ -18,6 +17,9 @@ class Sprite {
         this.sprites = sprites;
         this.opacity = 1;
         this.rotation = rotation;
+        this.CanInteract = false;
+        this.interactImage = new Image();
+        this.interactImage.src = `/img/interact.png`;
 
 
         this.image.onload = () => {
@@ -54,6 +56,14 @@ class Sprite {
                 width ?? this.image.width / this.frames.max * this.scale,
                 height ?? this.image.height * this.scale
             );
+            if (this.CanInteract) {
+                console.log('interact image')
+                c.drawImage(
+                    this.interactImage,
+                    this.position.x + 5,
+                    this.position.y - 20
+                )
+            }
             c.restore()
             // // Draw the border
             // c.strokeStyle = 'red'; // Set the border color
@@ -120,7 +130,6 @@ class Monster extends Sprite {
                     }, 200)
                 }
                 this.isAttacking = false;
-                console.log(this.name, this.isAttacking);
             }
         });
 
@@ -231,9 +240,6 @@ class Boundary {
     draw() {
 
         c.fillStyle = this.color ?? 'rgba(255, 0, 0, 0)'; // Fully transparent red
-        // c.strokeStyle = 'red'; // Set the border color
-        // c.lineWidth = 2; // Set the border thickness
-        // c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
         c.fillRect(
             this.position.x,
@@ -258,33 +264,35 @@ class TextBox {
     }
 
     StartDialogue(img, textString) {
-        this.onDialog = !this.onDialog;
-        if (!this.onDialog) {
-            this.hideDialog()
-            return;
-        };
+        console.log('dialog starting');
+        this.onDialog = true;
         this.currentText = textString;
 
-        const imageElement = document.querySelector('#dialog-box img');
+        // const imageElement = document.querySelector('#dialog-box img');
         const dialogBox = document.querySelector('#dialog-box');
         const textContent = document.querySelector('.text-content');
         const containerScroll = document.querySelector('.textbox');
         textContent.innerHTML = '';
 
-        if (imageElement) {
-            imageElement.src = '/img/Rise.png'; // Change the image source
+        const characterImage = new Image();
+        characterImage.src = img;
+        characterImage.className = 'character-image';
+        characterImage.alt = 'character';
+
+        characterImage.onload = () => {
+            if (dialogBox) {
+                dialogBox.insertBefore(characterImage, dialogBox.firstChild);
+                dialogBox.style.display = ''; // Make the dialog box visible
+            } else {
+                dialogBox.style.display = 'none'
+            }
+    
+            if (textContent) {
+                this.isTalking = true;
+                typeWriter(0, textString, textContent, containerScroll, this);
+            }
         }
 
-        if (dialogBox) {
-            dialogBox.style.display = ''; // Make the dialog box visible
-        } else {
-            dialogBox.style.display = 'none'
-        }
-
-        if (textContent) {
-            this.isTalking = true;
-            typeWriter(0, textString, textContent, containerScroll);
-        }
     }
 
     nextButton() {
@@ -302,20 +310,23 @@ class TextBox {
             if (this.onDialog) {
                 this.onDialog = false;
                 this.hideDialog();
+                dispatchEvent();
             }
         }
     };
 
     startSkipButton() {
-        document.querySelector('#skip-button').addEventListener('click', ()=>{this.nextButton()});
+        document.querySelector('#skip-button').addEventListener('click', () => { this.nextButton() });
     }
     hideDialog() {
         const dialogBox = document.querySelector('#dialog-box');
         const textContent = document.querySelector('.text-content');
+        const image = document.querySelector(`.character-image`);
         if (textContent) {
             textContent.innerHTML = '';
         }
         dialogBox.style.display = 'none';
+        dialogBox.removeChild(image);
         this.isTalking = false;
     }
 }
@@ -343,5 +354,39 @@ class DirectionButton {
             this.onDialog
         );
     }
+
+}
+
+class Interactable {
+    constructor({ position, width, height, actions }) {
+        this.position = position;
+        this.width = width;
+        this.height = height;
+        this.actions = actions;
+    }
+
+    draw() {
+        // c.fillStyle = 'red';
+        // c.fillRect(
+        //     this.position.x,
+        //     this.position.y,
+        //     this.width,
+        //     this.height
+        // );
+        c.strokeStyle =  'rgba(255, 0, 0, 0)'; // Set the border color
+        c.lineWidth = 2; // Set the border thickness
+        c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+    }
+
+    isClicked(clickX, clickY) {
+        // Check if the click is within the interactable bounds
+        return (
+            clickX >= this.position.x &&
+            clickX <= this.position.x + this.width &&
+            clickY >= this.position.y &&
+            clickY <= this.position.y + this.height
+        );
+    }
+
 
 }
